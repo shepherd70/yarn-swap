@@ -13,7 +13,7 @@ Single-file HTML app — no build step, no backend. Open `index.html` in a brows
 
 ## Roadmap
 
-- [ ] Expand yarn database (currently ~38 widely available yarns; specs approximate)
+- [ ] Expand yarn database (currently 45 widely available yarns; specs approximate)
 - [ ] Affiliate links + click-through tracking
 - [ ] Live stock/price checking
 - [ ] Texture/halo attributes in scoring

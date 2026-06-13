@@ -1,0 +1,138 @@
+{
+  "1": {
+    "status": "complete",
+    "notes": "Starter database of 45 yarns built in index.html YARNS array, each with brand, name, weight class, fiber %s, yards, grams, typical gauge, machine-washable flag, and price tier 1-3. Specs are approximate/per-ball — accuracy review tracked under task 30."
+  },
+  "2": {
+    "status": "complete",
+    "notes": "WEIGHTS (8 classes Lace→Super Bulky), FIBERS (11 fibers), and FAMILY mapping (animal/plant/synthetic) defined at index.html:194-198."
+  },
+  "3": {
+    "status": "complete",
+    "notes": "score() at index.html:252-256 — same weight class = 35 pts, adjacent = 17 pts, returns null (excluded) when >1 class apart."
+  },
+  "4": {
+    "status": "complete",
+    "notes": "Yards-per-gram thickness term at index.html:258-261, up to 25 pts, scaled by relative difference (25 * (1 - diff*3))."
+  },
+  "5": {
+    "status": "complete",
+    "notes": "Gauge term at index.html:263-264: 15 - 3*|gaugeDiff| when both known; 8 pts neutral credit when target/candidate gauge missing."
+  },
+  "6": {
+    "status": "complete",
+    "notes": "Fiber term at index.html:266-276: 60% exact-fiber overlap + 40% family overlap, scaled to 20 pts. wool and merino treated as near-equivalent for the exact match."
+  },
+  "7": {
+    "status": "complete",
+    "notes": "Care term at index.html:278-279: 5 pts unless the target is machine-washable and the candidate is not (only that loss is penalized)."
+  },
+  "8": {
+    "status": "complete",
+    "notes": "whyText() at index.html:284-294 builds the plain-language rationale per card (weight class, thickness % delta, fiber character, machine-wash warning)."
+  },
+  "9": {
+    "status": "complete",
+    "notes": "Pick mode: yarnSelect dropdown populated and alpha-sorted in init() (index.html:377-381); getTarget() reads the selected yarn (line 316)."
+  },
+  "10": {
+    "status": "complete",
+    "notes": "Specs mode form (index.html:120-152) with weight, yards/ball, grams/ball, optional gauge, main fiber + %, machine-wash checkbox; parsed in getTarget() (lines 317-329)."
+  },
+  "11": {
+    "status": "complete",
+    "notes": "Care, price-tier, and fiber-family filters (index.html:154-180) applied in findSubs() (lines 339-341)."
+  },
+  "12": {
+    "status": "complete",
+    "notes": "setTab() at index.html:307-313 toggles pick/specs panels and active tab styling."
+  },
+  "13": {
+    "status": "complete",
+    "notes": "Responsive grid/card collapse at ≤700px via media queries (index.html:61, 81)."
+  },
+  "14": {
+    "status": "complete",
+    "notes": "findSubs() (index.html:331-373) scores, filters to score ≥ 55, sorts desc, takes top 10, renders cards with great (≥80) / good badge and a circular score."
+  },
+  "15": {
+    "status": "complete",
+    "notes": "buyLinks() at index.html:297-303 generates retailer search URLs (LoveCrafts, Hobbii, Amazon) from brand + name. Affiliate-link swap tracked under task 26."
+  },
+  "16": {
+    "status": "complete",
+    "notes": "Empty-state panel rendered when no candidates pass filters (index.html:349-352)."
+  },
+  "17": {
+    "status": "complete",
+    "notes": "README.md present at project root — overview, how-it-works (scoring breakdown), roadmap, and gauge-swatch disclaimer."
+  },
+  "18": {
+    "status": "complete",
+    "notes": "Prototype runs end-to-end as a single static index.html (no build step). Treated as informally smoke-tested at initial commit; formal cross-browser + edge-case testing tracked under tasks 28-29."
+  },
+  "19": {
+    "status": "not-started",
+    "notes": "Roadmap item, in progress. DB expanded to 45 yarns; thin classes filled out (Sport, Lace, Super Bulky each got verified additions sourced from manufacturer/retailer specs). Remaining: broaden coverage further and verify every legacy record against ball-band data (see task 30)."
+  },
+  "20": {
+    "status": "not-started",
+    "notes": "Roadmap item. Add texture/halo descriptor fields (e.g. smooth, tweed, brushed/halo) to YARNS records to support drape-aware matching."
+  },
+  "21": {
+    "status": "not-started",
+    "notes": "Depends on task 20. Add a texture/halo term to score() and rebalance point weights so the totals still cap at 100."
+  },
+  "22": {
+    "status": "not-started",
+    "notes": "Validate scoring against a set of known-good real-world substitutions; tune the 35/25/20/15/5 weights and the thickness/gauge penalty slopes."
+  },
+  "23": {
+    "status": "complete",
+    "notes": "Resolved: getTarget() now reads an explicit optional 'Secondary fiber' dropdown (sFiber2). The <100% remainder is assigned to the chosen secondary fiber, or left unaccounted when 'unknown' is selected — no more acrylic-or-wool guess."
+  },
+  "24": {
+    "status": "complete",
+    "notes": "Resolved: validateSpecs() validates yards/grams (>0, sane upper bound), optional gauge (4-50 or blank), and main fiber % (1-100); offending fields get an .invalid outline and an inline error list is shown instead of silently substituting defaults."
+  },
+  "25": {
+    "status": "not-started",
+    "notes": "Accessibility pass: confirm every label is associated with its control, keyboard navigation/focus order works, and accent colours meet WCAG AA contrast against backgrounds."
+  },
+  "26": {
+    "status": "not-started",
+    "notes": "Roadmap item. Replace plain retailer search links with affiliate links and add click-through tracking."
+  },
+  "27": {
+    "status": "not-started",
+    "notes": "Roadmap item. Encode the target yarn + active filters into a shareable URL (query string / hash) and restore state on load."
+  },
+  "28": {
+    "status": "not-started",
+    "notes": "Manually verify layout and behaviour in Chrome, Firefox, Safari, and Edge."
+  },
+  "29": {
+    "status": "not-started",
+    "notes": "Exercise extremes: Lace and Super Bulky targets, custom specs with partial fiber %, and targets with no gauge supplied (neutral-credit path)."
+  },
+  "30": {
+    "status": "not-started",
+    "notes": "Final accuracy review and sign-off of every yarn record against authoritative ball-band data before release."
+  },
+  "31": {
+    "status": "not-started",
+    "notes": "Roadmap item. Integrate live stock/price checking from retailers (likely needs a backend or third-party API — currently the app is fully static)."
+  },
+  "32": {
+    "status": "not-started",
+    "notes": "Deploy the single-file app to a static host (GitHub Pages or Netlify). No build step required."
+  },
+  "33": {
+    "status": "not-started",
+    "notes": "Update README to reflect the final feature set once Draft 2 / Final items land (texture scoring, affiliate links, shareable URLs, deployment URL)."
+  },
+  "34": {
+    "status": "not-started",
+    "notes": "Final QA sign-off on the deployed production build."
+  }
+}
