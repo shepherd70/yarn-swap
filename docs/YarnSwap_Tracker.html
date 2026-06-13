@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<script type="application/json" id="cowork-artifact-meta">
+{
+  "name": "YarnSwap Tracker",
+  "schemaVersion": 1,
+  "description": "YarnSwap — build and roadmap tracker for the yarn-substitution matcher. Tasks cover the yarn database, matching engine, UI & input, results & buy links, documentation, testing, and deployment across Draft 1 / Draft 2 / Final milestones. State is saved to a local JSON file in your project directory via the File System Access API."
+}
+</script>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YarnSwap — Build Tracker</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f7f9fc; color: #1a2a3a; font-size: 13px; }
+  .header { background: #5a2535; color: #fff; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .header-left h1 { font-size: 15px; font-weight: 700; }
+  .header-left h1 span { color: #f0a8b8; }
+  .header-left p { font-size: 11px; color: #d8aab6; margin-top: 2px; }
+  .header-right { display: flex; gap: 18px; align-items: center; }
+  .hstat { text-align: center; }
+  .hstat .num { font-size: 20px; font-weight: 700; color: #f0a8b8; line-height: 1; }
+  .hstat .lbl { font-size: 10px; color: #d8aab6; text-transform: uppercase; letter-spacing: .4px; margin-top: 1px; }
+  .controls { background: #7a3548; padding: 8px 20px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; border-bottom: 2px solid #b5485d; }
+  .ctrl-label { font-size: 10px; color: #e8c0c9; text-transform: uppercase; letter-spacing: .4px; }
+  .milestone-tabs { display: flex; gap: 3px; }
+  .tab { padding: 4px 11px; border-radius: 20px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1.5px solid transparent; color: #e8c0c9; transition: all .15s; }
+  .tab:hover { color: #fff; border-color: #e8c0c9; }
+  .tab.active { color: #5a2535; background: #f0a8b8; border-color: #f0a8b8; }
+  .divider { width: 1px; height: 20px; background: #9a5567; }
+  select { background: #8f4356; color: #fff; border: 1px solid #9a5567; border-radius: 5px; padding: 4px 8px; font-size: 11px; cursor: pointer; }
+  select:focus { outline: none; border-color: #f0a8b8; }
+
+  /* File save controls */
+  .file-bar { background: #4a1d2b; padding: 5px 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #6a3041; }
+  .file-status { font-size: 10px; display: flex; align-items: center; gap: 6px; }
+  .file-dot { width: 7px; height: 7px; border-radius: 50%; background: #8a6a72; flex-shrink: 0; }
+  .file-dot.connected { background: #22c55e; }
+  .file-dot.saving { background: #f0a8b8; }
+  .file-dot.error { background: #ef4444; }
+  .file-name { color: #d8aab6; font-size: 10px; max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .file-name.connected { color: #7dd3a8; }
+  .file-btn { padding: 3px 10px; border-radius: 4px; font-size: 10px; font-weight: 600; cursor: pointer; border: 1px solid; transition: all .15s; }
+  .file-btn.connect { background: transparent; border-color: #f0a8b8; color: #f0a8b8; }
+  .file-btn.connect:hover { background: #f0a8b8; color: #4a1d2b; }
+  .file-btn.disconnect { background: transparent; border-color: #8a6a72; color: #d8aab6; }
+  .file-btn.disconnect:hover { border-color: #ef4444; color: #ef4444; }
+  .save-msg { font-size: 10px; color: #d8aab6; margin-left: auto; opacity: 0; transition: opacity .3s; }
+  .save-msg.show { opacity: 1; }
+
+  .progress-overview { background: #fff; border-bottom: 1px solid #d0dce8; padding: 10px 20px; display: flex; gap: 20px; }
+  .ms-progress { flex: 1; }
+  .ms-progress .ms-label { display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 4px; font-weight: 600; }
+  .ms-bar-track { height: 6px; border-radius: 3px; background: #e5edf5; overflow: hidden; }
+  .ms-bar-fill { height: 100%; border-radius: 3px; transition: width .4s ease; }
+  .fill-d1 { background: #7c3aed; } .fill-d2 { background: #0284c7; } .fill-fin { background: #059669; }
+  .main { padding: 16px 20px; }
+  .ms-section { margin-bottom: 22px; }
+  .ms-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 2px solid #d0dce8; }
+  .ms-badge { display: inline-flex; align-items: center; padding: 3px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+  .ms-badge.d1 { background: #ede9fe; color: #7c3aed; }
+  .ms-badge.d2 { background: #e0f2fe; color: #0284c7; }
+  .ms-badge.fin { background: #d1fae5; color: #059669; }
+  .ms-sub { font-size: 10px; color: #6b7f93; font-style: italic; margin-left: 4px; }
+  .ms-count { font-size: 11px; color: #6b7f93; margin-left: auto; }
+  .prog-group { margin-bottom: 8px; border: 1px solid #d0dce8; border-radius: 7px; overflow: hidden; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+  .prog-header { padding: 8px 12px; background: #5a2535; color: #fff; display: flex; align-items: center; gap: 7px; cursor: pointer; user-select: none; }
+  .prog-header:hover { background: #7a3548; }
+  .prog-icon { font-size: 12px; }
+  .prog-name { font-size: 11px; font-weight: 700; flex: 1; }
+  .prog-mini-bar { width: 60px; height: 4px; border-radius: 2px; background: #9a5567; overflow: hidden; }
+  .prog-mini-fill { height: 100%; border-radius: 2px; background: #f0a8b8; transition: width .4s; }
+  .prog-pct { font-size: 10px; color: #d8aab6; min-width: 28px; text-align: right; }
+  .chevron { font-size: 9px; color: #d8aab6; transition: transform .2s; }
+  .prog-group.collapsed .chevron { transform: rotate(-90deg); }
+  .prog-group.collapsed .prog-body { display: none; }
+  .prog-body table { width: 100%; border-collapse: collapse; }
+  .prog-body th { font-size: 9px; text-transform: uppercase; letter-spacing: .4px; color: #6b7f93; padding: 5px 10px; background: #f4f7fb; border-bottom: 1px solid #d0dce8; text-align: left; }
+  .task-row { border-bottom: 1px solid #eef2f7; }
+  .task-row:last-child { border-bottom: none; }
+  .task-row:hover { background: #f8fbff; }
+  .task-row td { padding: 7px 10px; vertical-align: middle; }
+  .task-name { font-size: 12px; color: #1a2a3a; line-height: 1.4; }
+  .task-name.done { text-decoration: line-through; color: #9ab0c4; }
+  .status-btn { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; cursor: pointer; border: none; white-space: nowrap; transition: all .15s; }
+  .status-btn:hover { opacity: .82; transform: scale(1.04); }
+  .status-btn.not-started { background: #e8edf2; color: #4a5a6a; }
+  .status-btn.in-progress  { background: #dbeafe; color: #1d4ed8; }
+  .status-btn.complete     { background: #dcfce7; color: #15803d; }
+  .status-btn.blocked      { background: #fee2e2; color: #b91c1c; }
+  .notes-input { width: 100%; border: 1px solid transparent; border-radius: 3px; padding: 2px 5px; font-size: 11px; color: #6b7f93; background: transparent; font-family: inherit; resize: none; }
+  .notes-input:focus { outline: none; border-color: #d0dce8; background: #fff; color: #1a2a3a; }
+  .notes-input::placeholder { color: #c0cdd8; font-style: italic; }
+  .legend { display: flex; gap: 12px; padding: 8px 20px; background: #fff; border-top: 1px solid #d0dce8; font-size: 10px; color: #6b7f93; flex-wrap: wrap; align-items: center; }
+  .legend-item { display: flex; align-items: center; gap: 4px; }
+  .legend-dot { width: 7px; height: 7px; border-radius: 2px; }
+  .empty { color: #6b7f93; padding: 32px; text-align: center; }
+
+  /* No-support banner */
+  .no-support { background: #fef3cd; border-bottom: 1px solid #f0c040; padding: 7px 20px; font-size: 11px; color: #7a5c00; display: none; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>YarnSwap · <span>Build &amp; Roadmap Tracker</span></h1>
+    <p>Yarn-substitution matcher — database, scoring engine, UI, deployment</p>
+  </div>
+  <div class="header-right">
+    <div class="hstat"><div class="num" id="h-total">0</div><div class="lbl">Total</div></div>
+    <div class="hstat"><div class="num" id="h-done">0</div><div class="lbl">Done</div></div>
+    <div class="hstat"><div class="num" id="h-prog">0</div><div class="lbl">Active</div></div>
+    <div class="hstat"><div class="num" id="h-pct">0%</div><div class="lbl">Overall</div></div>
+  </div>
+</div>
+
+<div class="no-support" id="no-support-banner">
+  ⚠️ Your browser doesn't support the File System Access API. Progress won't be saved between sessions. Use Chrome or Edge for file persistence.
+</div>
+
+<div class="file-bar">
+  <div class="file-status">
+    <div class="file-dot" id="file-dot"></div>
+    <span class="file-name" id="file-name">No save file connected</span>
+  </div>
+  <button class="file-btn connect" id="file-connect-btn" onclick="connectFile()">Connect save file…</button>
+  <button class="file-btn disconnect" id="file-disconnect-btn" style="display:none" onclick="disconnectFile()">Disconnect</button>
+  <span class="save-msg" id="save-msg">✓ Saved</span>
+</div>
+
+<div class="controls">
+  <span class="ctrl-label">Milestone</span>
+  <div class="milestone-tabs">
+    <div class="tab active" data-ms="all">All</div>
+    <div class="tab" data-ms="Draft 1">Draft 1</div>
+    <div class="tab" data-ms="Draft 2">Draft 2</div>
+    <div class="tab" data-ms="Final">Final</div>
+  </div>
+  <div class="divider"></div>
+  <span class="ctrl-label">Area</span>
+  <select id="prog-filter"><option value="all">All Areas</option></select>
+  <div class="divider"></div>
+  <span class="ctrl-label">Status</span>
+  <select id="status-filter">
+    <option value="all">All</option>
+    <option value="not-started">Not Started</option>
+    <option value="in-progress">In Progress</option>
+    <option value="complete">Complete</option>
+    <option value="blocked">Blocked</option>
+  </select>
+</div>
+
+<div class="progress-overview">
+  <div class="ms-progress">
+    <div class="ms-label"><span style="color:#7c3aed">Draft 1</span><span id="pct-d1" style="color:#7c3aed">0%</span></div>
+    <div class="ms-bar-track"><div class="ms-bar-fill fill-d1" id="bar-d1" style="width:0%"></div></div>
+  </div>
+  <div class="ms-progress">
+    <div class="ms-label"><span style="color:#0284c7">Draft 2</span><span id="pct-d2" style="color:#0284c7">0%</span></div>
+    <div class="ms-bar-track"><div class="ms-bar-fill fill-d2" id="bar-d2" style="width:0%"></div></div>
+  </div>
+  <div class="ms-progress">
+    <div class="ms-label"><span style="color:#059669">Final</span><span id="pct-fin" style="color:#059669">0%</span></div>
+    <div class="ms-bar-track"><div class="ms-bar-fill fill-fin" id="bar-fin" style="width:0%"></div></div>
+  </div>
+</div>
+
+<div class="main" id="main-content"></div>
+
+<div class="legend">
+  <strong style="color:#1a2a3a">Status:</strong>
+  <div class="legend-item"><div class="legend-dot" style="background:#4a5a6a"></div>Not Started</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#1d4ed8"></div>In Progress</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#15803d"></div>Complete</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#b91c1c"></div>Blocked</div>
+  <span style="margin-left:auto;font-size:10px">Click badge to cycle · Notes editable inline</span>
+</div>
+
+<script>
+// ── Task data ──────────────────────────────────────────────────────────────
+const MS_SUBS = {
+  'Draft 1': 'Core built, functional end-to-end',
+  'Draft 2': 'Reviewed, refined, ready to ship',
+  'Final':   'Polished, deployed, signed off'
+};
+const MILESTONES = ['Draft 1','Draft 2','Final'];
+const STATUS_CYCLE = ['not-started','in-progress','complete','blocked'];
+const STATUS_LABELS = {'not-started':'○ Not Started','in-progress':'◑ In Progress','complete':'● Complete','blocked':'✕ Blocked'};
+const PROG_ICONS = {
+  'Yarn Database':        '🧶',
+  'Matching Engine':      '🎯',
+  'UI & Input':           '🖥',
+  'Results & Buy Links':  '🛒',
+  'Documentation':        '📝',
+  'Testing & QA':         '🧪',
+  'Deployment':           '🚀',
+};
+
+const TASKS = [
+  {id:1,  program:'Yarn Database', milestone:'Draft 1', task:'Build starter yarn database (~38 yarns, specs per ball)'},
+  {id:2,  program:'Yarn Database', milestone:'Draft 1', task:'Define weight classes, fiber list, and fiber-family mapping'},
+  {id:3,  program:'Matching Engine', milestone:'Draft 1', task:'Weight-class scoring (35 pts) + exclude yarns >1 class away'},
+  {id:4,  program:'Matching Engine', milestone:'Draft 1', task:'Thickness scoring via yards-per-gram (25 pts)'},
+  {id:5,  program:'Matching Engine', milestone:'Draft 1', task:'Gauge scoring (15 pts) with neutral credit when gauge unknown'},
+  {id:6,  program:'Matching Engine', milestone:'Draft 1', task:'Fiber-content scoring (20 pts: exact + family overlap, wool≈merino)'},
+  {id:7,  program:'Matching Engine', milestone:'Draft 1', task:'Care/washability scoring (5 pts)'},
+  {id:8,  program:'Matching Engine', milestone:'Draft 1', task:'Generate human-readable "why" match explanations'},
+  {id:9,  program:'UI & Input', milestone:'Draft 1', task:'"Pick the pattern yarn" mode (sorted dropdown from database)'},
+  {id:10, program:'UI & Input', milestone:'Draft 1', task:'"Enter yarn specs" manual mode (weight, yardage, grams, gauge, fiber, %)'},
+  {id:11, program:'UI & Input', milestone:'Draft 1', task:'Care / price / fiber-family result filters'},
+  {id:12, program:'UI & Input', milestone:'Draft 1', task:'Tab switching between pick / specs modes'},
+  {id:13, program:'UI & Input', milestone:'Draft 1', task:'Responsive layout for mobile (≤700px breakpoints)'},
+  {id:14, program:'Results & Buy Links', milestone:'Draft 1', task:'Render scored result cards (top 10, ≥55, great/good badge)'},
+  {id:15, program:'Results & Buy Links', milestone:'Draft 1', task:'Retailer search links (LoveCrafts, Hobbii, Amazon)'},
+  {id:16, program:'Results & Buy Links', milestone:'Draft 1', task:'Empty-state messaging when no matches pass filters'},
+  {id:17, program:'Documentation', milestone:'Draft 1', task:'README — overview, how-it-works, roadmap, disclaimer'},
+  {id:18, program:'Testing & QA', milestone:'Draft 1', task:'Manual end-to-end smoke test in browser'},
+  {id:19, program:'Yarn Database', milestone:'Draft 2', task:'Expand database beyond ~38 yarns; verify specs against manufacturer data'},
+  {id:20, program:'Yarn Database', milestone:'Draft 2', task:'Add texture / halo attributes to yarn records'},
+  {id:21, program:'Matching Engine', milestone:'Draft 2', task:'Incorporate texture / halo into scoring'},
+  {id:22, program:'Matching Engine', milestone:'Draft 2', task:'Calibrate scoring weights against known real-world substitutions'},
+  {id:23, program:'Matching Engine', milestone:'Draft 2', task:'Refine custom-spec remainder-fiber assumption (rough acrylic/wool fill at index.html:320)'},
+  {id:24, program:'UI & Input', milestone:'Draft 2', task:'Input validation + guardrails on the specs form'},
+  {id:25, program:'UI & Input', milestone:'Draft 2', task:'Accessibility pass (label associations, keyboard nav, colour contrast)'},
+  {id:26, program:'Results & Buy Links', milestone:'Draft 2', task:'Affiliate links + click-through tracking'},
+  {id:27, program:'Results & Buy Links', milestone:'Draft 2', task:'Shareable result URLs (encode target yarn + filters)'},
+  {id:28, program:'Testing & QA', milestone:'Draft 2', task:'Cross-browser test (Chrome, Firefox, Safari, Edge)'},
+  {id:29, program:'Testing & QA', milestone:'Draft 2', task:'Edge-case tests (lace / super-bulky extremes, custom fiber remainder, no-gauge)'},
+  {id:30, program:'Yarn Database', milestone:'Final', task:'Final data-accuracy review and sign-off'},
+  {id:31, program:'Results & Buy Links', milestone:'Final', task:'Live stock / price checking integration'},
+  {id:32, program:'Deployment', milestone:'Final', task:'Deploy to static host (GitHub Pages / Netlify)'},
+  {id:33, program:'Documentation', milestone:'Final', task:'Update README to reflect final feature set'},
+  {id:34, program:'Testing & QA', milestone:'Final', task:'Final QA sign-off on production build'},
+];
+
+// ── State ──────────────────────────────────────────────────────────────────
+// Draft 1 (ids 1–18) is complete in the current prototype; everything else not started.
+const DONE = new Set([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]);
+const state = {};
+TASKS.forEach(t => {
+  state[t.id] = { status: DONE.has(t.id) ? 'complete' : 'not-started', notes: '' };
+});
+
+let activeMs = 'all', activeProg = 'all', activeSt = 'all';
+
+// ── File System Access API ─────────────────────────────────────────────────
+const DB_NAME = 'yarn-tracker-db';
+const DB_STORE = 'handles';
+const DB_KEY = 'saveFile';
+const FS_SUPPORTED = ('showOpenFilePicker' in window);
+
+let fileHandle = null;
+let saveTimer = null;
+let isSaving = false;
+
+if (!FS_SUPPORTED) {
+  document.getElementById('no-support-banner').style.display = 'block';
+  document.getElementById('file-connect-btn').disabled = true;
+  document.getElementById('file-connect-btn').style.opacity = '0.4';
+  document.getElementById('file-connect-btn').title = 'File System Access API not supported in this browser';
+}
+
+// IndexedDB helpers
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = e => e.target.result.createObjectStore(DB_STORE);
+    req.onsuccess = e => resolve(e.target.result);
+    req.onerror = e => reject(e.target.error);
+  });
+}
+async function dbGet(key) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(DB_STORE, 'readonly');
+    const req = tx.objectStore(DB_STORE).get(key);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function dbSet(key, val) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(DB_STORE, 'readwrite');
+    const req = tx.objectStore(DB_STORE).put(val, key);
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
+  });
+}
+async function dbDelete(key) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(DB_STORE, 'readwrite');
+    const req = tx.objectStore(DB_STORE).delete(key);
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
+  });
+}
+
+// UI helpers
+function setFileUI(status, name) {
+  const dot = document.getElementById('file-dot');
+  const nameEl = document.getElementById('file-name');
+  const connectBtn = document.getElementById('file-connect-btn');
+  const disconnectBtn = document.getElementById('file-disconnect-btn');
+
+  dot.className = 'file-dot' + (status ? ' ' + status : '');
+  nameEl.textContent = name || 'No save file connected';
+  nameEl.className = 'file-name' + (status === 'connected' ? ' connected' : '');
+
+  if (status === 'connected' || status === 'saving') {
+    connectBtn.textContent = 'Change file…';
+    disconnectBtn.style.display = 'inline-block';
+  } else {
+    connectBtn.textContent = 'Connect save file…';
+    disconnectBtn.style.display = 'none';
+  }
+}
+
+function flashSaved() {
+  const msg = document.getElementById('save-msg');
+  msg.classList.add('show');
+  setTimeout(() => msg.classList.remove('show'), 1800);
+}
+
+// Load state from file
+async function loadFromFile(handle) {
+  try {
+    const file = await handle.getFile();
+    const text = await file.text();
+    const saved = JSON.parse(text);
+    // Merge saved state into current state (only known ids)
+    Object.keys(saved).forEach(id => {
+      if (state[id] !== undefined) {
+        state[id] = { ...state[id], ...saved[id] };
+      }
+    });
+    return true;
+  } catch (e) {
+    console.warn('Could not load state from file:', e);
+    return false;
+  }
+}
+
+// Save state to file
+async function saveToFile() {
+  if (!fileHandle) return;
+  isSaving = true;
+  setFileUI('saving', fileHandle.name);
+  try {
+    const writable = await fileHandle.createWritable();
+    await writable.write(JSON.stringify(state, null, 2));
+    await writable.close();
+    setFileUI('connected', fileHandle.name);
+    flashSaved();
+  } catch (e) {
+    console.error('Save failed:', e);
+    setFileUI('error', fileHandle.name + ' (save failed)');
+  }
+  isSaving = false;
+}
+
+// Debounced auto-save
+function scheduleSave() {
+  if (!fileHandle) return;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveToFile, 600);
+}
+
+// Connect to a file (new or existing)
+async function connectFile() {
+  if (!FS_SUPPORTED) return;
+  try {
+    const opts = {
+      suggestedName: 'yarn-tracker-state.json',
+      types: [{ description: 'JSON State File', accept: { 'application/json': ['.json'] } }]
+    };
+    // Try showSaveFilePicker first so user can create or pick
+    let handle;
+    try {
+      handle = await window.showSaveFilePicker(opts);
+    } catch (e) {
+      if (e.name === 'AbortError') return; // user cancelled
+      // Fallback to open picker if save picker not available
+      [handle] = await window.showOpenFilePicker({
+        types: [{ description: 'JSON State File', accept: { 'application/json': ['.json'] } }]
+      });
+    }
+    fileHandle = handle;
+    await dbSet(DB_KEY, handle);
+
+    // If the file already has content, load it; otherwise save current state
+    const file = await handle.getFile();
+    if (file.size > 0) {
+      const loaded = await loadFromFile(handle);
+      if (loaded) render();
+    }
+    await saveToFile();
+  } catch (e) {
+    if (e.name !== 'AbortError') {
+      console.error('Connect failed:', e);
+      setFileUI('error', 'Connection failed');
+    }
+  }
+}
+
+// Disconnect
+async function disconnectFile() {
+  fileHandle = null;
+  await dbDelete(DB_KEY);
+  setFileUI(null, null);
+}
+
+// On load: try to restore handle from IndexedDB
+async function initFile() {
+  if (!FS_SUPPORTED) return;
+  try {
+    const handle = await dbGet(DB_KEY);
+    if (!handle) return;
+    // Request permission (required after page reload)
+    const perm = await handle.queryPermission({ mode: 'readwrite' });
+    if (perm === 'granted') {
+      fileHandle = handle;
+      const loaded = await loadFromFile(handle);
+      if (loaded) render();
+      setFileUI('connected', handle.name);
+    } else {
+      // Permission needs re-granting — show a prompt
+      setFileUI(null, null);
+      const reBtn = document.getElementById('file-connect-btn');
+      reBtn.textContent = 'Re-connect ' + handle.name + '…';
+      reBtn.onclick = async () => {
+        const p = await handle.requestPermission({ mode: 'readwrite' });
+        if (p === 'granted') {
+          fileHandle = handle;
+          const loaded = await loadFromFile(handle);
+          if (loaded) render();
+          setFileUI('connected', handle.name);
+          reBtn.textContent = 'Change file…';
+          reBtn.onclick = connectFile;
+        }
+      };
+    }
+  } catch (e) {
+    console.warn('Could not restore file handle:', e);
+  }
+}
+
+// ── Render ─────────────────────────────────────────────────────────────────
+function filtered() {
+  return TASKS.filter(t =>
+    (activeMs === 'all' || t.milestone === activeMs) &&
+    (activeProg === 'all' || t.program === activeProg) &&
+    (activeSt === 'all' || state[t.id].status === activeSt)
+  );
+}
+
+function render() {
+  const tasks = filtered();
+  const main = document.getElementById('main-content');
+  const grouped = {};
+  MILESTONES.forEach(ms => { grouped[ms] = {}; });
+  tasks.forEach(t => {
+    if (!grouped[t.milestone][t.program]) grouped[t.milestone][t.program] = [];
+    grouped[t.milestone][t.program].push(t);
+  });
+  let html = '';
+  MILESTONES.forEach(ms => {
+    const key = ms === 'Draft 1' ? 'd1' : ms === 'Draft 2' ? 'd2' : 'fin';
+    const pm = grouped[ms];
+    const all = Object.values(pm).flat();
+    if (!all.length) return;
+    const done = all.filter(t => state[t.id].status === 'complete').length;
+    html += `<div class="ms-section">
+      <div class="ms-header">
+        <span class="ms-badge ${key}">${ms}</span>
+        <span class="ms-sub">${MS_SUBS[ms]}</span>
+        <span class="ms-count">${done} / ${all.length} complete</span>
+      </div>`;
+    Object.keys(pm).forEach(prog => {
+      const pt = pm[prog];
+      const pd = pt.filter(t => state[t.id].status === 'complete').length;
+      const pp = pt.length ? Math.round(pd/pt.length*100) : 0;
+      const gid = `g-${ms.replace(/\s/g,'-')}-${prog.replace(/[^a-z0-9]/gi,'-')}`;
+      html += `<div class="prog-group" id="${gid}">
+        <div class="prog-header" onclick="toggle('${gid}')">
+          <span class="prog-icon">${PROG_ICONS[prog]||'📌'}</span>
+          <span class="prog-name">${prog}</span>
+          <div class="prog-mini-bar"><div class="prog-mini-fill" style="width:${pp}%"></div></div>
+          <span class="prog-pct">${pp}%</span>
+          <span class="chevron">&#9660;</span>
+        </div>
+        <div class="prog-body"><table>
+          <tr><th style="width:50%">Task</th><th style="width:110px">Status</th><th>Notes</th></tr>`;
+      pt.forEach(t => {
+        const s = state[t.id].status;
+        const dn = s === 'complete' ? ' done' : '';
+        html += `<tr class="task-row">
+          <td><span class="task-name${dn}">${t.task}</span></td>
+          <td><button class="status-btn ${s}" onclick="cycleStatus(${t.id})">${STATUS_LABELS[s]}</button></td>
+          <td><textarea class="notes-input" rows="1" placeholder="Notes…"
+            onchange="state[${t.id}].notes=this.value;scheduleSave()"
+            onfocus="this.rows=2" onblur="this.rows=1">${state[t.id].notes}</textarea></td>
+        </tr>`;
+      });
+      html += `</table></div></div>`;
+    });
+    html += `</div>`;
+  });
+  main.innerHTML = html || `<p class="empty">No tasks match the current filters.</p>`;
+  updateStats();
+}
+
+function updateStats() {
+  const total = TASKS.length;
+  const done  = TASKS.filter(t => state[t.id].status === 'complete').length;
+  const prog  = TASKS.filter(t => state[t.id].status === 'in-progress').length;
+  document.getElementById('h-total').textContent = total;
+  document.getElementById('h-done').textContent  = done;
+  document.getElementById('h-prog').textContent  = prog;
+  document.getElementById('h-pct').textContent   = Math.round(done/total*100) + '%';
+  MILESTONES.forEach(ms => {
+    const key = ms==='Draft 1'?'d1':ms==='Draft 2'?'d2':'fin';
+    const mt = TASKS.filter(t=>t.milestone===ms);
+    const md = mt.filter(t=>state[t.id].status==='complete').length;
+    const p  = mt.length ? Math.round(md/mt.length*100) : 0;
+    document.getElementById(`pct-${key}`).textContent = p+'%';
+    document.getElementById(`bar-${key}`).style.width  = p+'%';
+  });
+}
+
+function cycleStatus(id) {
+  const i = STATUS_CYCLE.indexOf(state[id].status);
+  state[id].status = STATUS_CYCLE[(i+1) % STATUS_CYCLE.length];
+  render();
+  scheduleSave();
+}
+
+function toggle(id) { document.getElementById(id).classList.toggle('collapsed'); }
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    activeMs = tab.dataset.ms;
+    render();
+  });
+});
+document.getElementById('prog-filter').addEventListener('change', e => { activeProg = e.target.value; render(); });
+document.getElementById('status-filter').addEventListener('change', e => { activeSt = e.target.value; render(); });
+
+const sel = document.getElementById('prog-filter');
+[...new Set(TASKS.map(t=>t.program))].forEach(p => {
+  const o = document.createElement('option'); o.value=p; o.textContent=p; sel.appendChild(o);
+});
+
+render();
+initFile();
+</script>
+</body>
+</html>

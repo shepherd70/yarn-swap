@@ -9,11 +9,11 @@
     --bg: #faf7f2;
     --card: #ffffff;
     --ink: #2d2a26;
-    --muted: #7a736a;
+    --muted: #6a6359;
     --accent: #b5485d;
     --accent-soft: #f6e3e7;
     --good: #2e7d52;
-    --ok: #b07d2b;
+    --ok: #8a6120;
     --border: #e7e0d6;
     --radius: 12px;
   }
@@ -48,7 +48,7 @@
     border: 1px solid var(--border); background: var(--bg);
     border-radius: 8px; cursor: pointer; color: var(--muted);
   }
-  .tabs button.active { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); font-weight: bold; }
+  .tabs button.active { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: bold; }
 
   label { display: block; font-size: .85rem; color: var(--muted); margin-bottom: 4px; }
   select, input[type=number], input[type=text] {
@@ -72,6 +72,7 @@
   .results-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; }
   .results-head h2 { font-weight: normal; font-size: 1.3rem; margin: 0 0 12px; }
   .results-head .basis { font-size: .85rem; color: var(--muted); font-style: italic; }
+  .results-meta { font-size: .8rem; color: var(--muted); margin: -4px 0 14px; }
 
   .card {
     background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
@@ -97,6 +98,11 @@
   }
   .buylinks a:hover { background: var(--accent-soft); }
   .empty { text-align: center; color: var(--muted); font-style: italic; padding: 30px 0; }
+  .errs { border-color: var(--accent); }
+  .errs h2 { font-size: 1.05rem; font-weight: bold; margin: 0 0 8px; color: var(--accent); }
+  .errs ul { margin: 0; padding-left: 20px; font-size: .9rem; }
+  .errs li { margin: 2px 0; }
+  input.invalid { border-color: var(--accent); background: var(--accent-soft); }
   .note { font-size: .8rem; color: var(--muted); margin-top: 30px; text-align: center; }
 </style>
 </head>
@@ -108,8 +114,8 @@
 <main>
   <div class="panel">
     <div class="tabs">
-      <button id="tabPick" class="active" onclick="setTab('pick')">Pick the pattern yarn</button>
-      <button id="tabSpecs" onclick="setTab('specs')">Enter yarn specs</button>
+      <button id="tabPick" class="active">Pick the pattern yarn</button>
+      <button id="tabSpecs">Enter yarn specs</button>
     </div>
 
     <div id="modePick">
@@ -136,7 +142,7 @@
           <input type="number" id="sGauge" placeholder="e.g. 20" min="4" max="50">
         </div>
       </div>
-      <div class="grid cols3" style="margin-top:14px">
+      <div class="grid cols4" style="margin-top:14px">
         <div>
           <label for="sFiber">Main fiber</label>
           <select id="sFiber"></select>
@@ -144,6 +150,10 @@
         <div>
           <label for="sFiberPct">Main fiber %</label>
           <input type="number" id="sFiberPct" value="100" min="1" max="100">
+        </div>
+        <div>
+          <label for="sFiber2">Secondary fiber (if blend)</label>
+          <select id="sFiber2"></select>
         </div>
         <div class="check" style="margin-top:22px">
           <input type="checkbox" id="sWash"> <label for="sWash" style="margin:0;color:var(--ink)">Machine washable</label>
@@ -179,10 +189,10 @@
       </div>
     </div>
 
-    <button class="findbtn" onclick="findSubs()">Find substitutes</button>
+    <button id="findBtn" class="findbtn">Find substitutes</button>
   </div>
 
-  <div id="results"></div>
+  <div id="results" aria-live="polite"></div>
 
   <p class="note">Match scores weigh yarn weight, thickness (yards per gram), gauge, fiber content, and care.
   Always knit a gauge swatch before committing — no substitute is identical. Buy links open retailer searches.</p>
@@ -192,8 +202,8 @@
 // ---------- Yarn database (starter set — specs approximate, per ball) ----------
 // w: weight, f: fiber %s, yds/g: per ball, ga: typical sts per 4in, mw: machine washable, p: price tier 1-3
 const WEIGHTS = ["Lace","Fingering","Sport","DK","Worsted","Aran","Bulky","Super Bulky"];
-const FIBERS = ["wool","merino","alpaca","mohair","silk","cotton","linen","bamboo","acrylic","nylon","polyester"];
-const FAMILY = { wool:"animal", merino:"animal", alpaca:"animal", mohair:"animal", silk:"animal",
+const FIBERS = ["wool","merino","alpaca","mohair","silk","cashmere","cotton","linen","bamboo","acrylic","nylon","polyester"];
+const FAMILY = { wool:"animal", merino:"animal", alpaca:"animal", mohair:"animal", silk:"animal", cashmere:"animal",
                  cotton:"plant", linen:"plant", bamboo:"plant",
                  acrylic:"synthetic", nylon:"synthetic", polyester:"synthetic" };
 
@@ -221,6 +231,9 @@ const YARNS = [
  {b:"Knit Picks", n:"Swish DK", w:"DK", f:{merino:100}, yds:123, g:50, ga:22, mw:true, p:2},
  {b:"Scheepjes", n:"Catona", w:"Sport", f:{cotton:100}, yds:136, g:50, ga:24, mw:true, p:1},
  {b:"Drops", n:"Alpaca", w:"Sport", f:{alpaca:100}, yds:182, g:50, ga:24, mw:false, p:1},
+ {b:"Cascade", n:"220 Sport", w:"Sport", f:{wool:100}, yds:164, g:50, ga:24, mw:false, p:2},
+ {b:"Knit Picks", n:"Brava Sport", w:"Sport", f:{acrylic:100}, yds:340, g:100, ga:24, mw:true, p:1},
+ {b:"Debbie Bliss", n:"Baby Cashmerino", w:"Sport", f:{merino:55, acrylic:33, cashmere:12}, yds:137, g:50, ga:25, mw:true, p:2},
  {b:"Knit Picks", n:"Palette", w:"Fingering", f:{wool:100}, yds:231, g:50, ga:28, mw:false, p:1},
  {b:"Drops", n:"Fabel", w:"Fingering", f:{wool:75, nylon:25}, yds:224, g:50, ga:26, mw:true, p:1},
  {b:"Malabrigo", n:"Sock", w:"Fingering", f:{merino:100}, yds:440, g:100, ga:28, mw:true, p:3},
@@ -228,8 +241,12 @@ const YARNS = [
  {b:"Cascade", n:"Heritage", w:"Fingering", f:{merino:75, nylon:25}, yds:437, g:100, ga:28, mw:true, p:2},
  {b:"Rowan", n:"Kidsilk Haze", w:"Lace", f:{mohair:70, silk:30}, yds:229, g:25, ga:25, mw:false, p:3},
  {b:"Drops", n:"Kid-Silk", w:"Lace", f:{mohair:75, silk:25}, yds:230, g:25, ga:24, mw:false, p:2},
+ {b:"Malabrigo", n:"Lace", w:"Lace", f:{merino:100}, yds:470, g:50, ga:32, mw:false, p:3},
+ {b:"Knit Picks", n:"Shadow", w:"Lace", f:{merino:100}, yds:440, g:50, ga:30, mw:false, p:1},
  {b:"Lion Brand", n:"Wool-Ease Thick & Quick", w:"Super Bulky", f:{acrylic:80, wool:20}, yds:106, g:170, ga:9, mw:true, p:1},
  {b:"Cascade", n:"Magnum", w:"Super Bulky", f:{wool:100}, yds:123, g:250, ga:8, mw:false, p:2},
+ {b:"Malabrigo", n:"Rasta", w:"Super Bulky", f:{merino:100}, yds:90, g:150, ga:8, mw:false, p:3},
+ {b:"Bernat", n:"Blanket", w:"Super Bulky", f:{polyester:100}, yds:220, g:300, ga:8, mw:true, p:1},
  {b:"Bernat", n:"Softee Chunky", w:"Bulky", f:{acrylic:100}, yds:108, g:100, ga:13, mw:true, p:1},
  {b:"Drops", n:"Andes", w:"Bulky", f:{wool:65, alpaca:35}, yds:104, g:100, ga:13, mw:false, p:1},
  {b:"Lion Brand", n:"Hue + Me", w:"Bulky", f:{acrylic:80, wool:20}, yds:137, g:125, ga:12, mw:true, p:1},
@@ -239,6 +256,11 @@ const YARNS = [
 ];
 
 // ---------- helpers ----------
+// escape any string before it goes into innerHTML. all current data is static,
+// but routing interpolation through this keeps the app safe once free-text
+// fields (e.g. a custom yarn name) are added.
+const escapeHtml = s => String(s).replace(/[&<>"']/g, c =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const ypg = y => y.yds / y.g;
 const famPct = f => {
   const out = {animal:0, plant:0, synthetic:0};
@@ -249,34 +271,60 @@ const fiberLabel = f => Object.entries(f).sort((a,b)=>b[1]-a[1])
   .map(([fib,pct]) => `${pct}% ${fib}`).join(", ");
 
 // ---------- scoring ----------
-function score(target, cand) {
-  const wi = WEIGHTS.indexOf(target.w), wj = WEIGHTS.indexOf(cand.w);
-  const wDiff = Math.abs(wi - wj);
-  if (wDiff > 1) return null;                       // too far apart in weight
-  let pts = wDiff === 0 ? 35 : 17;
+// term weights: full-match points per term (weight + thickness + fiber + gauge + care = 100)
+const PTS = {
+  weight: 35,         // same weight class
+  weightAdjacent: 17, // one class away
+  thickness: 25,      // yards-per-gram closeness
+  fiber: 20,          // fiber content overlap
+  gauge: 15,          // stitch-gauge closeness
+  gaugeUnknown: 8,    // neutral credit when the target's gauge isn't known
+  care: 5,            // not losing machine-washability
+};
+const THICKNESS_SLOPE = 3;     // thickness term reaches 0 at a 33% relative difference
+const GAUGE_SLOPE = 3;         // points lost per stitch (per 4 in) of gauge difference
+const FIBER_EXACT_SHARE = 0.6; // exact-fiber vs fiber-family mix in the fiber term
+const MIN_SCORE = 55;          // candidates scoring below this are hidden
+const MAX_RESULTS = 10;        // show at most this many matches
 
-  // thickness: yards per gram
+// relative thickness difference, symmetric: measured against the mean of the
+// two values so A-vs-B always equals B-vs-A
+function thicknessDiff(target, cand) {
   const a = ypg(target), b = ypg(cand);
-  const diff = Math.abs(a - b) / a;
-  pts += Math.max(0, 25 * (1 - diff * 3));
+  return Math.abs(a - b) / ((a + b) / 2);
+}
 
-  // gauge
-  if (target.ga && cand.ga) pts += Math.max(0, 15 - 3 * Math.abs(target.ga - cand.ga));
-  else pts += 8; // unknown gauge: neutral credit
-
-  // fiber: 60% exact-fiber overlap + 40% family overlap
+// 0-100 fiber similarity: blend of exact-fiber overlap and family overlap.
+// used by both score() and whyText() so the rationale matches the number.
+function fiberSimilarity(target, cand) {
   let exact = 0;
   for (const fib of FIBERS) exact += Math.min(target.f[fib]||0, cand.f[fib]||0);
-  // treat wool & merino as near-equivalent for "exact"
+  // treat wool & merino as near-equivalent for the exact-overlap part
   const tw = (target.f.wool||0)+(target.f.merino||0), cw = (cand.f.wool||0)+(cand.f.merino||0);
-  exact = Math.max(exact, Math.min(tw,cw) + exact - Math.min(target.f.wool||0,cand.f.wool||0) - Math.min(target.f.merino||0,cand.f.merino||0));
+  exact = Math.max(exact, exact + Math.min(tw,cw) - Math.min(target.f.wool||0,cand.f.wool||0) - Math.min(target.f.merino||0,cand.f.merino||0));
   const tf = famPct(target.f), cf = famPct(cand.f);
   let fam = 0;
   for (const k of ["animal","plant","synthetic"]) fam += Math.min(tf[k], cf[k]);
-  pts += (0.6 * exact + 0.4 * fam) * 0.20;
+  return FIBER_EXACT_SHARE * exact + (1 - FIBER_EXACT_SHARE) * fam;
+}
+
+function score(target, cand) {
+  const wDiff = Math.abs(WEIGHTS.indexOf(target.w) - WEIGHTS.indexOf(cand.w));
+  if (wDiff > 1) return null;                       // too far apart in weight
+  let pts = wDiff === 0 ? PTS.weight : PTS.weightAdjacent;
+
+  // thickness: yards per gram
+  pts += Math.max(0, PTS.thickness * (1 - thicknessDiff(target, cand) * THICKNESS_SLOPE));
+
+  // gauge
+  if (target.ga && cand.ga) pts += Math.max(0, PTS.gauge - GAUGE_SLOPE * Math.abs(target.ga - cand.ga));
+  else pts += PTS.gaugeUnknown;
+
+  // fiber
+  pts += fiberSimilarity(target, cand) * PTS.fiber / 100;
 
   // care: only penalize losing machine-washability
-  pts += (target.mw && !cand.mw) ? 0 : 5;
+  pts += (target.mw && !cand.mw) ? 0 : PTS.care;
 
   return Math.round(pts);
 }
@@ -284,16 +332,17 @@ function score(target, cand) {
 function whyText(target, cand) {
   const bits = [];
   bits.push(target.w === cand.w ? "same weight class" : "adjacent weight class — swatch carefully");
-  const d = Math.round(100 * Math.abs(ypg(target)-ypg(cand)) / ypg(target));
+  const d = Math.round(100 * thicknessDiff(target, cand));  // same measure score() uses
   bits.push(d <= 5 ? "nearly identical thickness" : `${d}% thickness difference`);
-  const tf = famPct(target.f), cf = famPct(cand.f);
-  const sameFam = ["animal","plant","synthetic"].reduce((s,k)=>s+Math.min(tf[k],cf[k]),0);
-  bits.push(sameFam >= 75 ? "similar fiber character" : "different fiber character — drape will change");
+  const fiber = fiberSimilarity(target, cand);              // same measure score() uses
+  bits.push(fiber >= 75 ? "similar fiber character" : "different fiber character — drape will change");
   if (target.mw && !cand.mw) bits.push("NOT machine washable");
   return bits.join(" · ");
 }
 
 // ---------- buy links ----------
+// per-retailer query tuning: Amazon gets an extra "yarn" keyword to disambiguate
+// against its general catalog; LoveCrafts/Hobbii search yarn-only catalogs already.
 function buyLinks(y) {
   const q = encodeURIComponent(`${y.b} ${y.n}`);
   return `
@@ -312,12 +361,46 @@ function setTab(t) {
   document.getElementById("modeSpecs").style.display = t === "specs" ? "" : "none";
 }
 
+// validate the specs form; returns an array of human-readable error messages.
+// also toggles the .invalid outline on offending fields. empty array === valid.
+function validateSpecs() {
+  const errs = [];
+  const ids = ["sYds", "sGrams", "sGauge", "sFiberPct"];
+  ids.forEach(id => document.getElementById(id).classList.remove("invalid"));
+  const mark = (id, msg) => { document.getElementById(id).classList.add("invalid"); errs.push(msg); };
+  const raw = id => document.getElementById(id).value.trim();
+  const num = id => raw(id) === "" ? NaN : Number(raw(id));
+
+  const yds = num("sYds");
+  if (!Number.isFinite(yds) || yds <= 0) mark("sYds", "Yards per ball must be a number greater than 0.");
+  else if (yds > 3000) mark("sYds", "Yards per ball looks too high (max 3000).");
+
+  const grams = num("sGrams");
+  if (!Number.isFinite(grams) || grams <= 0) mark("sGrams", "Grams per ball must be a number greater than 0.");
+  else if (grams > 1000) mark("sGrams", "Grams per ball looks too high (max 1000).");
+
+  const gaugeRaw = raw("sGauge");
+  if (gaugeRaw !== "") {                       // gauge is optional
+    const ga = Number(gaugeRaw);
+    if (!Number.isFinite(ga) || ga < 4 || ga > 50) mark("sGauge", "Gauge must be between 4 and 50 sts / 4 in (or left blank).");
+  }
+
+  const pct = num("sFiberPct");
+  if (!Number.isFinite(pct) || pct < 1 || pct > 100) mark("sFiberPct", "Main fiber % must be between 1 and 100.");
+
+  return errs;
+}
+
 function getTarget() {
   if (tab === "pick") return YARNS[+document.getElementById("yarnSelect").value];
   const fib = document.getElementById("sFiber").value;
   const pct = Math.min(100, Math.max(1, +document.getElementById("sFiberPct").value || 100));
+  const fib2 = document.getElementById("sFiber2").value;   // "" = unknown / not specified
   const f = {[fib]: pct};
-  if (pct < 100) f[FAMILY[fib] === "synthetic" ? "wool" : "acrylic"] = 100 - pct; // rough assumption for remainder
+  // assign the <100% remainder to an explicit secondary fiber. if left unknown,
+  // leave it unaccounted — it simply won't contribute to fiber overlap, rather
+  // than guessing a fiber that could skew the match.
+  if (pct < 100 && fib2 && fib2 !== fib) f[fib2] = 100 - pct;
   return {
     b:"(custom)", n:"pattern yarn",
     w: document.getElementById("sWeight").value,
@@ -329,45 +412,63 @@ function getTarget() {
 }
 
 function findSubs() {
+  if (tab === "specs") {
+    const errs = validateSpecs();
+    if (errs.length) {
+      document.getElementById("results").innerHTML =
+        `<div class="panel errs"><h2>Please fix the following:</h2><ul>${
+          errs.map(e => `<li>${escapeHtml(e)}</li>`).join("")}</ul></div>`;
+      return;
+    }
+  }
+
   const target = getTarget();
   const wash = document.getElementById("fWash").value;
   const price = document.getElementById("fPrice").value;
   const fam = document.getElementById("fFam").value;
 
-  const rows = YARNS
+  const scored = YARNS
     .filter(y => !(tab === "pick" && y === target))
     .filter(y => wash !== "machine" || y.mw)
     .filter(y => price === "any" || y.p <= +price)
     .filter(y => fam === "any" || famPct(y.f)[fam] >= 50)
     .map(y => ({y, s: score(target, y)}))
-    .filter(r => r.s !== null && r.s >= 55)
-    .sort((a,b) => b.s - a.s)
-    .slice(0, 10);
+    .filter(r => r.s !== null)
+    .sort((a,b) => b.s - a.s);
+  const passing = scored.filter(r => r.s >= MIN_SCORE);
+  const rows = passing.slice(0, MAX_RESULTS);
+  const belowBar = scored.length - passing.length;
 
   const el = document.getElementById("results");
-  const basis = `${target.b} ${target.n} — ${target.w}, ${fiberLabel(target.f)}, ${target.yds} yds / ${target.g} g`;
+  const basis = escapeHtml(`${target.b} ${target.n} — ${target.w}, ${fiberLabel(target.f)}, ${target.yds} yds / ${target.g} g`);
   if (!rows.length) {
-    el.innerHTML = `<div class="panel empty">No good matches with these filters. Try loosening the filters.</div>`;
+    el.innerHTML = `<div class="panel empty">${belowBar
+      ? `${belowBar} candidate${belowBar>1?"s":""} matched the filters but scored below the ${MIN_SCORE}-point quality bar. Try loosening the filters.`
+      : `No candidates match these filters. Try loosening the filters.`}</div>`;
     return;
   }
+  const metaBits = [];
+  if (passing.length > rows.length) metaBits.push(`showing the top ${rows.length} of ${passing.length} matches`);
+  if (belowBar > 0) metaBits.push(`${belowBar} candidate${belowBar>1?"s":""} below the ${MIN_SCORE}-point quality bar hidden`);
   el.innerHTML = `
     <div class="results-head">
       <h2>${rows.length} substitute${rows.length>1?"s":""} found</h2>
       <span class="basis">for ${basis}</span>
     </div>` +
+    (metaBits.length ? `<div class="results-meta">${metaBits.join(" · ")}</div>` : "") +
     rows.map(({y, s}) => `
       <div class="card">
         <div class="score ${s >= 80 ? "great" : "good"}">${Math.min(s,99)}%</div>
         <div>
-          <h3>${y.b} ${y.n}</h3>
+          <h3>${escapeHtml(`${y.b} ${y.n}`)}</h3>
           <div class="brand">${s >= 80 ? "Excellent match" : "Good match"}</div>
           <div class="specs">
-            <span>${y.w}</span><span>${fiberLabel(y.f)}</span>
+            <span>${escapeHtml(y.w)}</span><span>${escapeHtml(fiberLabel(y.f))}</span>
             <span>${y.yds} yds / ${y.g} g</span><span>${y.ga} sts / 4 in</span>
             <span>${y.mw ? "machine wash" : "hand wash"}</span>
             <span>${"$".repeat(y.p)}</span>
           </div>
-          <div class="why">${whyText(target, y)}</div>
+          <div class="why">${escapeHtml(whyText(target, y))}</div>
         </div>
         <div class="buylinks">${buyLinks(y)}</div>
       </div>`).join("");
@@ -385,6 +486,15 @@ function findSubs() {
   const sf = document.getElementById("sFiber");
   FIBERS.forEach(f => sf.add(new Option(f, f)));
   sf.value = "wool";
+  const sf2 = document.getElementById("sFiber2");
+  sf2.add(new Option("(unknown)", ""));
+  FIBERS.forEach(f => sf2.add(new Option(f, f)));
+  sf2.value = "";
+
+  // wire up controls (no inline handlers — keeps a strict CSP possible)
+  document.getElementById("tabPick").addEventListener("click", () => setTab("pick"));
+  document.getElementById("tabSpecs").addEventListener("click", () => setTab("specs"));
+  document.getElementById("findBtn").addEventListener("click", findSubs);
 })();
 </script>
 </body>
