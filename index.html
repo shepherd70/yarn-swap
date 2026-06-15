@@ -96,7 +96,7 @@
     font-size: .85rem; text-decoration: none; color: var(--accent);
     border: 1px solid var(--accent); border-radius: 6px; padding: 5px 10px; text-align: center;
   }
-  .buylinks a:hover { background: var(--accent-soft); }
+  .buylinks a:hover { background: var(--accent); color: #fff; }
   .empty { text-align: center; color: var(--muted); font-style: italic; padding: 30px 0; }
   .errs { border-color: var(--accent); }
   .errs h2 { font-size: 1.05rem; font-weight: bold; margin: 0 0 8px; color: var(--accent); }
@@ -340,6 +340,11 @@ function whyText(target, cand) {
   return bits.join(" · ");
 }
 
+// displayed score is capped at 99: this is a heuristic matcher, so it never
+// advertises a "perfect" 100% substitute (see the gauge-swatch disclaimer). The
+// true score still drives the great/good badge and the MIN_SCORE cutoff.
+const displayScore = s => Math.min(s, 99);
+
 // ---------- buy links ----------
 // per-retailer query tuning: Amazon gets an extra "yarn" keyword to disambiguate
 // against its general catalog; LoveCrafts/Hobbii search yarn-only catalogs already.
@@ -458,7 +463,7 @@ function findSubs() {
     (metaBits.length ? `<div class="results-meta">${metaBits.join(" · ")}</div>` : "") +
     rows.map(({y, s}) => `
       <div class="card">
-        <div class="score ${s >= 80 ? "great" : "good"}">${Math.min(s,99)}%</div>
+        <div class="score ${s >= 80 ? "great" : "good"}">${displayScore(s)}%</div>
         <div>
           <h3>${escapeHtml(`${y.b} ${y.n}`)}</h3>
           <div class="brand">${s >= 80 ? "Excellent match" : "Good match"}</div>

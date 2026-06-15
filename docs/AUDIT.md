@@ -2,6 +2,8 @@
 
 *Date: 2026-06-05 · Scope: full project (`index.html`, `README.md`, `docs/`)*
 
+> **SUPERSEDED (2026-06-14).** This audit describes the earlier **38-yarn** version of YarnSwap. The codebase has since moved to 45 yarns, and **most High/Med items below have been fixed** — the contrast failures, missing `aria-live`, missing input validation, the arbitrary fiber-remainder guess, the missing `escapeHtml` helper, and the inline `onclick` handlers. Its line numbers no longer match `index.html`. Kept for historical reference only; for the current state see [`yarn-swap-audit-2026-06.md`](yarn-swap-audit-2026-06.md).
+
 ## Verdict
 
 YarnSwap is a clean, well-built single-file prototype. The code is readable, the scoring math is internally consistent (no scores exceed 100, weight-class exclusion works, 768 of 1,406 candidate pairs are correctly filtered out as too far apart), and there is **no XSS vector today** because no free-text user input reaches `innerHTML`. The main gaps are all "pre-release" concerns the tracker already anticipates: data accuracy, accessibility contrast, input validation, and a couple of scoring heuristics that are arbitrary. Nothing here is a blocker for a prototype; several items are blockers for a public launch.
