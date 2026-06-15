@@ -3,100 +3,126 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="description" content="Find a workable substitute when the yarn your knitting or crochet pattern calls for isn't available.">
 <title>YarnSwap — Find a substitute yarn</title>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<header>
-  <h1>YarnSwap</h1>
-  <p>Can't find the yarn your pattern calls for? Find a workable substitute.</p>
+<header class="site-head">
+  <p class="eyebrow">Knit &amp; Crochet</p>
+  <h1 class="mark">Yarn<b>Swap</b></h1>
+  <p class="tagline">Can't get the yarn your pattern calls for? Find a workable substitute, scored on the things that actually matter.</p>
+  <hr class="rule">
 </header>
+
 <main>
-  <div class="panel">
-    <div class="tabs">
-      <button id="tabPick" class="active">Pick the pattern yarn</button>
-      <button id="tabSpecs">Enter yarn specs</button>
+  <section class="panel" aria-labelledby="finderTitle">
+    <h2 id="finderTitle" class="visually-hidden">Find a substitute</h2>
+
+    <div class="seg" role="tablist" aria-label="How to choose the pattern yarn">
+      <button id="tabPick" role="tab" aria-selected="true" aria-controls="modePick">Pick the pattern yarn</button>
+      <button id="tabSpecs" role="tab" aria-selected="false" aria-controls="modeSpecs">Enter yarn specs</button>
     </div>
 
-    <div id="modePick">
-      <label for="yarnSelect">Yarn the pattern calls for</label>
-      <select id="yarnSelect"></select>
+    <div id="modePick" role="tabpanel" aria-labelledby="tabPick">
+      <div class="field">
+        <label for="yarnSelect">Yarn the pattern calls for</label>
+        <select id="yarnSelect"></select>
+      </div>
     </div>
 
-    <div id="modeSpecs" style="display:none">
+    <div id="modeSpecs" role="tabpanel" aria-labelledby="tabSpecs" hidden>
       <div class="grid cols4">
-        <div>
+        <div class="field">
           <label for="sWeight">Yarn weight</label>
           <select id="sWeight"></select>
         </div>
-        <div>
+        <div class="field">
           <label for="sYds">Yards per ball</label>
-          <input type="number" id="sYds" value="220" min="1">
+          <input type="number" id="sYds" value="220" min="1" inputmode="numeric">
         </div>
-        <div>
+        <div class="field">
           <label for="sGrams">Grams per ball</label>
-          <input type="number" id="sGrams" value="100" min="1">
+          <input type="number" id="sGrams" value="100" min="1" inputmode="numeric">
         </div>
-        <div>
-          <label for="sGauge">Gauge (sts / 4 in, optional)</label>
-          <input type="number" id="sGauge" placeholder="e.g. 20" min="4" max="50">
+        <div class="field">
+          <label for="sGauge">Gauge (sts / 4 in)</label>
+          <input type="number" id="sGauge" placeholder="optional" min="4" max="50" inputmode="numeric">
         </div>
       </div>
-      <div class="grid cols4" style="margin-top:14px">
-        <div>
+      <div class="grid cols4 mt">
+        <div class="field">
           <label for="sFiber">Main fiber</label>
           <select id="sFiber"></select>
         </div>
-        <div>
+        <div class="field">
           <label for="sFiberPct">Main fiber %</label>
-          <input type="number" id="sFiberPct" value="100" min="1" max="100">
+          <input type="number" id="sFiberPct" value="100" min="1" max="100" inputmode="numeric">
         </div>
-        <div>
-          <label for="sFiber2">Secondary fiber (if blend)</label>
+        <div class="field">
+          <label for="sFiber2">Secondary fiber</label>
           <select id="sFiber2"></select>
         </div>
-        <div class="check" style="margin-top:22px">
-          <input type="checkbox" id="sWash"> <label for="sWash" style="margin:0;color:var(--ink)">Machine washable</label>
+        <div class="field">
+          <label for="sTexture">Texture</label>
+          <select id="sTexture"></select>
+        </div>
+      </div>
+      <div class="grid cols4 mt">
+        <div class="check">
+          <input type="checkbox" id="sWash">
+          <label for="sWash">Machine washable</label>
         </div>
       </div>
     </div>
 
-    <div class="grid cols3" style="margin-top:16px">
-      <div>
-        <label for="fWash">Care requirement</label>
-        <select id="fWash">
-          <option value="any">Any</option>
-          <option value="machine">Machine washable only</option>
-        </select>
+    <fieldset class="filters">
+      <legend>Narrow it down</legend>
+      <div class="grid cols3">
+        <div class="field">
+          <label for="fWash">Care requirement</label>
+          <select id="fWash">
+            <option value="any">Any</option>
+            <option value="machine">Machine washable only</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="fPrice">Price range</label>
+          <select id="fPrice">
+            <option value="any">Any</option>
+            <option value="1">Budget</option>
+            <option value="2">Budget–mid</option>
+            <option value="3">Any incl. premium</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="fFam">Fiber preference</label>
+          <select id="fFam">
+            <option value="any">Any fiber</option>
+            <option value="animal">Animal (wool, alpaca…)</option>
+            <option value="plant">Plant (cotton, linen…)</option>
+            <option value="synthetic">Synthetic (acrylic…)</option>
+          </select>
+        </div>
       </div>
-      <div>
-        <label for="fPrice">Price range</label>
-        <select id="fPrice">
-          <option value="any">Any</option>
-          <option value="1">Budget</option>
-          <option value="2">Budget–mid</option>
-          <option value="3">Any incl. premium</option>
-        </select>
-      </div>
-      <div>
-        <label for="fFam">Fiber preference</label>
-        <select id="fFam">
-          <option value="any">Any fiber</option>
-          <option value="animal">Animal (wool, alpaca…)</option>
-          <option value="plant">Plant (cotton, linen…)</option>
-          <option value="synthetic">Synthetic (acrylic…)</option>
-        </select>
-      </div>
-    </div>
+    </fieldset>
 
     <button id="findBtn" class="findbtn">Find substitutes</button>
-  </div>
+  </section>
 
-  <div id="results" aria-live="polite"></div>
+  <section id="results" aria-live="polite" aria-label="Substitute results"></section>
 
-  <p class="note">Match scores weigh yarn weight, thickness (yards per gram), gauge, fiber content, and care.
-  Always knit a gauge swatch before committing — no substitute is identical. Buy links open retailer searches.</p>
+  <footer>
+    <p class="note">Scores weigh <strong>weight class, thickness, fiber, gauge, texture, and care</strong>.
+    No substitute is identical — <strong>always knit a gauge swatch</strong> before committing. Buy links open retailer searches.
+    Specs spot-checked <span id="reviewed"></span>; confirm against your ball band.</p>
+    <p class="legend" aria-hidden="true">
+      <span><span class="dot dot-animal"></span>Animal</span>
+      <span><span class="dot dot-plant"></span>Plant</span>
+      <span><span class="dot dot-synthetic"></span>Synthetic</span>
+    </p>
+  </footer>
 </main>
 
 <script src="scoring.js"></script>

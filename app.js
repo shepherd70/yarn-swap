@@ -1,33 +1,38 @@
 /*
  * YarnSwap — UI layer (DOM wiring, rendering, filters).
  * Pure scoring/data lives in scoring.js and is reached via the global YarnSwap.
+ * No inline styles are emitted: dynamic visuals (score ring, swatch) use SVG
+ * presentation attributes, so the page runs under a strict style-src CSP.
  */
 (function () {
   "use strict";
 
   const {
-    WEIGHTS, FIBERS, YARNS, MIN_SCORE, MAX_RESULTS,
-    escapeHtml, famPct, fiberLabel, score, whyText, displayScore, buyLinks,
+    WEIGHTS, FIBERS, TEXTURES, YARNS, MIN_SCORE, MAX_RESULTS, SPECS_REVIEWED,
+    escapeHtml, famPct, fiberLabel, swatchColor, score, whyText, displayScore, buyLinks,
   } = window.YarnSwap;
 
-  // ---------- UI ----------
+  const $ = id => document.getElementById(id);
+
+  // ---------- tabs ----------
   let tab = "pick";
   function setTab(t) {
     tab = t;
-    document.getElementById("tabPick").classList.toggle("active", t === "pick");
-    document.getElementById("tabSpecs").classList.toggle("active", t === "specs");
-    document.getElementById("modePick").style.display = t === "pick" ? "" : "none";
-    document.getElementById("modeSpecs").style.display = t === "specs" ? "" : "none";
+    const pick = t === "pick";
+    $("tabPick").setAttribute("aria-selected", String(pick));
+    $("tabSpecs").setAttribute("aria-selected", String(!pick));
+    $("modePick").hidden = !pick;
+    $("modeSpecs").hidden = pick;
   }
 
-  // validate the specs form; returns an array of human-readable error messages.
-  // also toggles the .invalid outline on offending fields. empty array === valid.
+  // ---------- specs validation ----------
+  // returns an array of human-readable error messages and toggles .invalid.
   function validateSpecs() {
     const errs = [];
     const ids = ["sYds", "sGrams", "sGauge", "sFiberPct"];
-    ids.forEach(id => document.getElementById(id).classList.remove("invalid"));
-    const mark = (id, msg) => { document.getElementById(id).classList.add("invalid"); errs.push(msg); };
-    const raw = id => document.getElementById(id).value.trim();
+    ids.forEach(id => $(id).classList.remove("invalid"));
+    const mark = (id, msg) => { $(id).classList.add("invalid"); errs.push(msg); };
+    const raw = id => $(id).value.trim();
     const num = id => raw(id) === "" ? NaN : Number(raw(id));
 
     const yds = num("sYds");
@@ -51,109 +56,155 @@
   }
 
   function getTarget() {
-    if (tab === "pick") return YARNS[+document.getElementById("yarnSelect").value];
-    const fib = document.getElementById("sFiber").value;
-    const pct = Math.min(100, Math.max(1, +document.getElementById("sFiberPct").value || 100));
-    const fib2 = document.getElementById("sFiber2").value;   // "" = unknown / not specified
-    const f = {[fib]: pct};
+    if (tab === "pick") return YARNS[+$("yarnSelect").value];
+    const fib = $("sFiber").value;
+    const pct = Math.min(100, Math.max(1, +$("sFiberPct").value || 100));
+    const fib2 = $("sFiber2").value;   // "" = unknown / not specified
+    const f = { [fib]: pct };
     // assign the <100% remainder to an explicit secondary fiber. if left unknown,
-    // leave it unaccounted — it simply won't contribute to fiber overlap, rather
-    // than guessing a fiber that could skew the match.
+    // leave it unaccounted — it won't contribute to fiber overlap rather than
+    // guessing a fiber that could skew the match.
     if (pct < 100 && fib2 && fib2 !== fib) f[fib2] = 100 - pct;
     return {
-      b:"(custom)", n:"pattern yarn",
-      w: document.getElementById("sWeight").value,
-      f, yds:+document.getElementById("sYds").value || 220,
-      g:+document.getElementById("sGrams").value || 100,
-      ga:+document.getElementById("sGauge").value || null,
-      mw: document.getElementById("sWash").checked,
+      b: "(custom)", n: "pattern yarn",
+      w: $("sWeight").value,
+      f, yds: +$("sYds").value || 220,
+      g: +$("sGrams").value || 100,
+      ga: +$("sGauge").value || null,
+      t: $("sTexture").value || undefined,   // "" → unknown → neutral texture credit
+      mw: $("sWash").checked,
     };
   }
+
+  // ---------- rendering ----------
+  const RING_R = 26, RING_C = 2 * Math.PI * RING_R;
+  function ringSvg(d, tier) {
+    const off = RING_C * (1 - d / 100);
+    return `<svg class="ring" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="${d} percent match">
+      <circle class="ring-track" cx="32" cy="32" r="${RING_R}"></circle>
+      <circle class="ring-val ${tier}" cx="32" cy="32" r="${RING_R}" stroke-dasharray="${RING_C.toFixed(2)}" stroke-dashoffset="${off.toFixed(2)}" transform="rotate(-90 32 32)"></circle>
+      <text class="ring-num" x="32" y="33" text-anchor="middle">${d}</text>
+    </svg>`;
+  }
+  function swatchSvg(y) {
+    // swatchColor returns a #rrggbb derived from fiber family — safe in a fill attr
+    return `<svg class="swatch" width="13" height="13" viewBox="0 0 13 13" aria-hidden="true"><circle cx="6.5" cy="6.5" r="6.5" fill="${swatchColor(y)}"></circle></svg>`;
+  }
+
+  function cardHtml(y, s) {
+    const d = displayScore(s);
+    const tier = s >= 80 ? "great" : "good";
+    const name = escapeHtml(`${y.b} ${y.n}`);
+    const target = currentTarget;
+    return `<article class="card">
+      ${ringSvg(d, tier)}
+      <div class="card-main">
+        <div class="card-top">
+          <h3>${name}</h3>
+          <span class="match-label ${tier}">${tier === "great" ? "Excellent match" : "Good match"}</span>
+        </div>
+        <p class="fiber">${swatchSvg(y)}<span>${escapeHtml(fiberLabel(y.f))}</span></p>
+        <ul class="pills">
+          <li>${escapeHtml(y.w)}</li>
+          <li>${y.yds} yds / ${y.g} g</li>
+          <li>${y.ga} sts/4in</li>
+          <li class="cap">${escapeHtml(y.t)}</li>
+          <li>${y.mw ? "machine wash" : "hand wash"}</li>
+          <li>${"$".repeat(y.p)}</li>
+        </ul>
+        <p class="why">${escapeHtml(whyText(target, y))}</p>
+      </div>
+      <div class="buys" role="group" aria-label="Where to buy ${name}">
+        <span class="buys-label">Shop</span>
+        ${buyLinks(y)}
+      </div>
+    </article>`;
+  }
+
+  let currentTarget = null;
 
   function findSubs() {
     if (tab === "specs") {
       const errs = validateSpecs();
       if (errs.length) {
-        document.getElementById("results").innerHTML =
-          `<div class="panel errs"><h2>Please fix the following:</h2><ul>${
+        $("results").innerHTML =
+          `<div class="panel state-error"><h2>Please fix the following:</h2><ul>${
             errs.map(e => `<li>${escapeHtml(e)}</li>`).join("")}</ul></div>`;
         return;
       }
     }
 
-    const target = getTarget();
-    const wash = document.getElementById("fWash").value;
-    const price = document.getElementById("fPrice").value;
-    const fam = document.getElementById("fFam").value;
+    const target = currentTarget = getTarget();
+    const wash = $("fWash").value;
+    const price = $("fPrice").value;
+    const fam = $("fFam").value;
 
     const scored = YARNS
       .filter(y => !(tab === "pick" && y === target))
       .filter(y => wash !== "machine" || y.mw)
       .filter(y => price === "any" || y.p <= +price)
       .filter(y => fam === "any" || famPct(y.f)[fam] >= 50)
-      .map(y => ({y, s: score(target, y)}))
+      .map(y => ({ y, s: score(target, y) }))
       .filter(r => r.s !== null)
-      .sort((a,b) => b.s - a.s);
+      .sort((a, b) => b.s - a.s);
     const passing = scored.filter(r => r.s >= MIN_SCORE);
     const rows = passing.slice(0, MAX_RESULTS);
     const belowBar = scored.length - passing.length;
 
-    const el = document.getElementById("results");
+    const el = $("results");
     const basis = escapeHtml(`${target.b} ${target.n} — ${target.w}, ${fiberLabel(target.f)}, ${target.yds} yds / ${target.g} g`);
     if (!rows.length) {
-      el.innerHTML = `<div class="panel empty">${belowBar
-        ? `${belowBar} candidate${belowBar>1?"s":""} matched the filters but scored below the ${MIN_SCORE}-point quality bar. Try loosening the filters.`
+      el.innerHTML = `<div class="panel state state-empty">${belowBar
+        ? `${belowBar} candidate${belowBar > 1 ? "s" : ""} matched your filters but scored below the ${MIN_SCORE}-point quality bar. Try loosening the filters.`
         : `No candidates match these filters. Try loosening the filters.`}</div>`;
       return;
     }
     const metaBits = [];
     if (passing.length > rows.length) metaBits.push(`showing the top ${rows.length} of ${passing.length} matches`);
-    if (belowBar > 0) metaBits.push(`${belowBar} candidate${belowBar>1?"s":""} below the ${MIN_SCORE}-point quality bar hidden`);
+    if (belowBar > 0) metaBits.push(`${belowBar} candidate${belowBar > 1 ? "s" : ""} below the ${MIN_SCORE}-point quality bar hidden`);
     el.innerHTML = `
       <div class="results-head">
-        <h2>${rows.length} substitute${rows.length>1?"s":""} found</h2>
+        <h2>${rows.length} substitute${rows.length > 1 ? "s" : ""} found</h2>
         <span class="basis">for ${basis}</span>
       </div>` +
-      (metaBits.length ? `<div class="results-meta">${metaBits.join(" · ")}</div>` : "") +
-      rows.map(({y, s}) => `
-        <div class="card">
-          <div class="score ${s >= 80 ? "great" : "good"}">${displayScore(s)}%</div>
-          <div>
-            <h3>${escapeHtml(`${y.b} ${y.n}`)}</h3>
-            <div class="brand">${s >= 80 ? "Excellent match" : "Good match"}</div>
-            <div class="specs">
-              <span>${escapeHtml(y.w)}</span><span>${escapeHtml(fiberLabel(y.f))}</span>
-              <span>${y.yds} yds / ${y.g} g</span><span>${y.ga} sts / 4 in</span>
-              <span>${y.mw ? "machine wash" : "hand wash"}</span>
-              <span>${"$".repeat(y.p)}</span>
-            </div>
-            <div class="why">${escapeHtml(whyText(target, y))}</div>
-          </div>
-          <div class="buylinks">${buyLinks(y)}</div>
-        </div>`).join("");
+      (metaBits.length ? `<p class="results-meta">${metaBits.join(" · ")}</p>` : "") +
+      `<div class="cards">${rows.map(({ y, s }) => cardHtml(y, s)).join("")}</div>`;
   }
 
   // ---------- init ----------
   function init() {
-    const sel = document.getElementById("yarnSelect");
-    YARNS.map((y, i) => ({i, label:`${y.b} ${y.n} (${y.w})`}))
-         .sort((a,b) => a.label.localeCompare(b.label))
-         .forEach(({i, label}) => sel.add(new Option(label, i)));
-    const sw = document.getElementById("sWeight");
+    const sel = $("yarnSelect");
+    YARNS.map((y, i) => ({ i, label: `${y.b} ${y.n} (${y.w})` }))
+         .sort((a, b) => a.label.localeCompare(b.label))
+         .forEach(({ i, label }) => sel.add(new Option(label, i)));
+    const sw = $("sWeight");
     WEIGHTS.forEach(w => sw.add(new Option(w, w)));
     sw.value = "Worsted";
-    const sf = document.getElementById("sFiber");
+    const sf = $("sFiber");
     FIBERS.forEach(f => sf.add(new Option(f, f)));
     sf.value = "wool";
-    const sf2 = document.getElementById("sFiber2");
+    const sf2 = $("sFiber2");
     sf2.add(new Option("(unknown)", ""));
     FIBERS.forEach(f => sf2.add(new Option(f, f)));
     sf2.value = "";
+    const st = $("sTexture");
+    st.add(new Option("(unknown)", ""));
+    TEXTURES.forEach(t => st.add(new Option(t, t)));
+    st.value = "";
+
+    $("reviewed").textContent = SPECS_REVIEWED;
 
     // wire up controls (no inline handlers — keeps a strict CSP possible)
-    document.getElementById("tabPick").addEventListener("click", () => setTab("pick"));
-    document.getElementById("tabSpecs").addEventListener("click", () => setTab("specs"));
-    document.getElementById("findBtn").addEventListener("click", findSubs);
+    $("tabPick").addEventListener("click", () => setTab("pick"));
+    $("tabSpecs").addEventListener("click", () => setTab("specs"));
+    // arrow-key navigation across the tablist
+    document.querySelector(".seg").addEventListener("keydown", e => {
+      if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+      const next = tab === "pick" ? "specs" : "pick";
+      setTab(next);
+      $(next === "pick" ? "tabPick" : "tabSpecs").focus();
+    });
+    $("findBtn").addEventListener("click", findSubs);
   }
 
   document.addEventListener("DOMContentLoaded", init);
