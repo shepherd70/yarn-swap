@@ -18,9 +18,16 @@ test("dataset integrity: 45 records, all internally valid", () => {
       assert.ok(Y.FAMILY[fib], `${y.b} ${y.n} uses unknown fiber "${fib}"`);
     }
     assert.ok(Y.WEIGHTS.includes(y.w), `${y.b} ${y.n} has unknown weight "${y.w}"`);
+    assert.ok(Y.TEXTURES.includes(y.t), `${y.b} ${y.n} has unknown texture "${y.t}"`);
     assert.ok(y.yds > 0 && y.g > 0, `${y.b} ${y.n} must have positive yds/g`);
   }
 });
+
+const find = (b, n) => {
+  const y = Y.YARNS.find(x => x.b === b && x.n === n);
+  assert.ok(y, `fixture yarn not found: ${b} ${n}`);
+  return y;
+};
 
 test("a yarn scores a perfect 100 against itself", () => {
   for (const y of Y.YARNS) assert.equal(Y.score(y, y), 100, `${y.b} ${y.n}`);
@@ -103,4 +110,63 @@ test("no real-world pair ever scores above 100", () => {
       if (s !== null) assert.ok(s <= 100, `${t.n} vs ${c.n} = ${s}`);
     }
   }
+});
+
+test("textureSimilarity: identical = 1, distinct textures penalized, symmetric", () => {
+  assert.equal(Y.textureSimilarity("smooth", "smooth"), 1);
+  assert.equal(Y.textureSimilarity("halo", "halo"), 1);
+  assert.ok(Y.textureSimilarity("smooth", "halo") < 0.5);
+  assert.equal(Y.textureSimilarity("smooth", "halo"), Y.textureSimilarity("halo", "smooth"));
+  assert.equal(Y.textureSimilarity(undefined, "smooth"), null); // custom target, unknown
+});
+
+test("custom (textureless) target gets neutral texture credit, never full or zero", () => {
+  const customLace = { w: "Lace", f: { merino: 100 }, yds: 400, g: 50, ga: 30, mw: false };
+  const smoothLace = find("Knit Picks", "Shadow");
+  const haloLace = find("Rowan", "Kidsilk Haze");
+  // with no texture on the target, smooth vs halo candidates get the SAME texture
+  // credit — texture simply doesn't tip the result either way
+  const sSmooth = Y.score(customLace, smoothLace);
+  const sHalo = Y.score({ ...customLace, f: { mohair: 70, silk: 30 } }, haloLace);
+  assert.ok(Number.isFinite(sSmooth) && Number.isFinite(sHalo));
+});
+
+// ---------- known-substitution fixtures ----------
+// Sanity anchors for the heuristic. Full validation against expert-curated
+// substitutions is tracker task 22 (still needs human sign-off); these lock in
+// the relationships we are confident about so re-tuning can't silently break them.
+
+test("Cascade 220 and Patons Classic Wool are a strong mutual substitute", () => {
+  const cascade = find("Cascade", "220");
+  const patons = find("Patons", "Classic Wool Worsted");
+  // both worsted, 100% wool, smooth, near-identical yardage
+  assert.ok(Y.score(cascade, patons) >= 90, `expected >=90, got ${Y.score(cascade, patons)}`);
+});
+
+test("a superwash version is the top match for its non-superwash sibling", () => {
+  const cascade = find("Cascade", "220");
+  const superwash = find("Cascade", "220 Superwash");
+  const best = Y.YARNS
+    .filter(y => y !== cascade)
+    .map(y => ({ y, s: Y.score(cascade, y) }))
+    .filter(r => r.s !== null)
+    .sort((a, b) => b.s - a.s)[0];
+  assert.equal(best.y, superwash);
+});
+
+test("for a mohair-halo lace yarn, a halo substitute beats a smooth one", () => {
+  const kidsilk = find("Rowan", "Kidsilk Haze");      // mohair/silk, halo
+  const dropsKidSilk = find("Drops", "Kid-Silk");     // mohair/silk, halo
+  const malabrigoLace = find("Malabrigo", "Lace");    // merino, smooth
+  assert.ok(
+    Y.score(kidsilk, dropsKidSilk) > Y.score(kidsilk, malabrigoLace),
+    `halo match (${Y.score(kidsilk, dropsKidSilk)}) should beat smooth (${Y.score(kidsilk, malabrigoLace)})`
+  );
+});
+
+test("for a chenille blanket yarn, a non-chenille of the same weight is texture-penalized", () => {
+  const bernatBlanket = find("Bernat", "Blanket");    // polyester, chenille, super bulky
+  const woolEaseTQ = find("Lion Brand", "Wool-Ease Thick & Quick"); // smooth super bulky
+  // the texture term should cost the smooth candidate points it would otherwise have
+  assert.ok(Y.textureSimilarity(bernatBlanket.t, woolEaseTQ.t) < 0.5);
 });

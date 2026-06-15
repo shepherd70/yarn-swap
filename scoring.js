@@ -17,53 +17,56 @@
   const FAMILY = { wool:"animal", merino:"animal", alpaca:"animal", mohair:"animal", silk:"animal", cashmere:"animal",
                    cotton:"plant", linen:"plant", bamboo:"plant",
                    acrylic:"synthetic", nylon:"synthetic", polyester:"synthetic" };
+  // surface texture — drives the texture term in score() (mohair halo vs a smooth
+  // plied yarn knit up very differently even at the same weight and fiber).
+  const TEXTURES = ["smooth","tweed","chainette","roving","halo","chenille"];
 
   const YARNS = [
-   {b:"Cascade", n:"220", w:"Worsted", f:{wool:100}, yds:220, g:100, ga:20, mw:false, p:2},
-   {b:"Cascade", n:"220 Superwash", w:"Worsted", f:{wool:100}, yds:220, g:100, ga:20, mw:true, p:2},
-   {b:"Patons", n:"Classic Wool Worsted", w:"Worsted", f:{wool:100}, yds:194, g:100, ga:20, mw:false, p:1},
-   {b:"Knit Picks", n:"Wool of the Andes", w:"Worsted", f:{wool:100}, yds:110, g:50, ga:19, mw:false, p:1},
-   {b:"Malabrigo", n:"Rios", w:"Worsted", f:{merino:100}, yds:210, g:100, ga:18, mw:true, p:3},
-   {b:"Lion Brand", n:"Wool-Ease", w:"Worsted", f:{acrylic:80, wool:20}, yds:197, g:85, ga:18, mw:true, p:1},
-   {b:"Plymouth", n:"Encore Worsted", w:"Worsted", f:{acrylic:75, wool:25}, yds:200, g:100, ga:18, mw:true, p:2},
-   {b:"Berroco", n:"Vintage", w:"Worsted", f:{acrylic:52, wool:40, nylon:8}, yds:218, g:100, ga:19, mw:true, p:2},
-   {b:"Red Heart", n:"Super Saver", w:"Worsted", f:{acrylic:100}, yds:364, g:198, ga:17, mw:true, p:1},
-   {b:"Caron", n:"Simply Soft", w:"Worsted", f:{acrylic:100}, yds:315, g:170, ga:18, mw:true, p:1},
-   {b:"Knit Picks", n:"Brava Worsted", w:"Worsted", f:{acrylic:100}, yds:218, g:100, ga:18, mw:true, p:1},
-   {b:"Berroco", n:"Ultra Alpaca", w:"Worsted", f:{alpaca:50, wool:50}, yds:215, g:100, ga:20, mw:false, p:2},
-   {b:"Lily", n:"Sugar'n Cream", w:"Worsted", f:{cotton:100}, yds:120, g:71, ga:18, mw:true, p:1},
-   {b:"Cascade", n:"Ultra Pima", w:"DK", f:{cotton:100}, yds:220, g:100, ga:22, mw:true, p:2},
-   {b:"Stylecraft", n:"Special DK", w:"DK", f:{acrylic:100}, yds:322, g:100, ga:22, mw:true, p:1},
-   {b:"Paintbox", n:"Simply DK", w:"DK", f:{acrylic:100}, yds:302, g:100, ga:22, mw:true, p:1},
-   {b:"Drops", n:"Karisma", w:"DK", f:{wool:100}, yds:109, g:50, ga:21, mw:true, p:1},
-   {b:"Drops", n:"Merino Extra Fine", w:"DK", f:{merino:100}, yds:114, g:50, ga:21, mw:true, p:1},
-   {b:"Sirdar", n:"Snuggly DK", w:"DK", f:{acrylic:55, nylon:45}, yds:179, g:50, ga:22, mw:true, p:1},
-   {b:"Rowan", n:"Felted Tweed", w:"DK", f:{wool:50, alpaca:25, polyester:25}, yds:191, g:50, ga:23, mw:false, p:3},
-   {b:"Knit Picks", n:"Swish DK", w:"DK", f:{merino:100}, yds:123, g:50, ga:22, mw:true, p:2},
-   {b:"Scheepjes", n:"Catona", w:"Sport", f:{cotton:100}, yds:136, g:50, ga:24, mw:true, p:1},
-   {b:"Drops", n:"Alpaca", w:"Sport", f:{alpaca:100}, yds:182, g:50, ga:24, mw:false, p:1},
-   {b:"Cascade", n:"220 Sport", w:"Sport", f:{wool:100}, yds:164, g:50, ga:24, mw:false, p:2},
-   {b:"Knit Picks", n:"Brava Sport", w:"Sport", f:{acrylic:100}, yds:340, g:100, ga:24, mw:true, p:1},
-   {b:"Debbie Bliss", n:"Baby Cashmerino", w:"Sport", f:{merino:55, acrylic:33, cashmere:12}, yds:137, g:50, ga:25, mw:true, p:2},
-   {b:"Knit Picks", n:"Palette", w:"Fingering", f:{wool:100}, yds:231, g:50, ga:28, mw:false, p:1},
-   {b:"Drops", n:"Fabel", w:"Fingering", f:{wool:75, nylon:25}, yds:224, g:50, ga:26, mw:true, p:1},
-   {b:"Malabrigo", n:"Sock", w:"Fingering", f:{merino:100}, yds:440, g:100, ga:28, mw:true, p:3},
-   {b:"Lion Brand", n:"Sock-Ease", w:"Fingering", f:{wool:75, nylon:25}, yds:438, g:100, ga:28, mw:true, p:1},
-   {b:"Cascade", n:"Heritage", w:"Fingering", f:{merino:75, nylon:25}, yds:437, g:100, ga:28, mw:true, p:2},
-   {b:"Rowan", n:"Kidsilk Haze", w:"Lace", f:{mohair:70, silk:30}, yds:229, g:25, ga:25, mw:false, p:3},
-   {b:"Drops", n:"Kid-Silk", w:"Lace", f:{mohair:75, silk:25}, yds:230, g:25, ga:24, mw:false, p:2},
-   {b:"Malabrigo", n:"Lace", w:"Lace", f:{merino:100}, yds:470, g:50, ga:32, mw:false, p:3},
-   {b:"Knit Picks", n:"Shadow", w:"Lace", f:{merino:100}, yds:440, g:50, ga:30, mw:false, p:1},
-   {b:"Lion Brand", n:"Wool-Ease Thick & Quick", w:"Super Bulky", f:{acrylic:80, wool:20}, yds:106, g:170, ga:9, mw:true, p:1},
-   {b:"Cascade", n:"Magnum", w:"Super Bulky", f:{wool:100}, yds:123, g:250, ga:8, mw:false, p:2},
-   {b:"Malabrigo", n:"Rasta", w:"Super Bulky", f:{merino:100}, yds:90, g:150, ga:8, mw:false, p:3},
-   {b:"Bernat", n:"Blanket", w:"Super Bulky", f:{polyester:100}, yds:220, g:300, ga:8, mw:true, p:1},
-   {b:"Bernat", n:"Softee Chunky", w:"Bulky", f:{acrylic:100}, yds:108, g:100, ga:13, mw:true, p:1},
-   {b:"Drops", n:"Andes", w:"Bulky", f:{wool:65, alpaca:35}, yds:104, g:100, ga:13, mw:false, p:1},
-   {b:"Lion Brand", n:"Hue + Me", w:"Bulky", f:{acrylic:80, wool:20}, yds:137, g:125, ga:12, mw:true, p:1},
-   {b:"Drops", n:"Paris", w:"Aran", f:{cotton:100}, yds:82, g:50, ga:17, mw:true, p:1},
-   {b:"Drops", n:"Nepal", w:"Aran", f:{wool:65, alpaca:35}, yds:82, g:50, ga:17, mw:false, p:1},
-   {b:"Lion Brand", n:"Heartland", w:"Aran", f:{acrylic:100}, yds:251, g:142, ga:16, mw:true, p:1},
+   {b:"Cascade", n:"220", w:"Worsted", f:{wool:100}, yds:220, g:100, ga:20, mw:false, p:2, t:"smooth"},
+   {b:"Cascade", n:"220 Superwash", w:"Worsted", f:{wool:100}, yds:220, g:100, ga:20, mw:true, p:2, t:"smooth"},
+   {b:"Patons", n:"Classic Wool Worsted", w:"Worsted", f:{wool:100}, yds:194, g:100, ga:20, mw:false, p:1, t:"smooth"},
+   {b:"Knit Picks", n:"Wool of the Andes", w:"Worsted", f:{wool:100}, yds:110, g:50, ga:19, mw:false, p:1, t:"smooth"},
+   {b:"Malabrigo", n:"Rios", w:"Worsted", f:{merino:100}, yds:210, g:100, ga:18, mw:true, p:3, t:"smooth"},
+   {b:"Lion Brand", n:"Wool-Ease", w:"Worsted", f:{acrylic:80, wool:20}, yds:197, g:85, ga:18, mw:true, p:1, t:"smooth"},
+   {b:"Plymouth", n:"Encore Worsted", w:"Worsted", f:{acrylic:75, wool:25}, yds:200, g:100, ga:18, mw:true, p:2, t:"smooth"},
+   {b:"Berroco", n:"Vintage", w:"Worsted", f:{acrylic:52, wool:40, nylon:8}, yds:218, g:100, ga:19, mw:true, p:2, t:"smooth"},
+   {b:"Red Heart", n:"Super Saver", w:"Worsted", f:{acrylic:100}, yds:364, g:198, ga:17, mw:true, p:1, t:"smooth"},
+   {b:"Caron", n:"Simply Soft", w:"Worsted", f:{acrylic:100}, yds:315, g:170, ga:18, mw:true, p:1, t:"smooth"},
+   {b:"Knit Picks", n:"Brava Worsted", w:"Worsted", f:{acrylic:100}, yds:218, g:100, ga:18, mw:true, p:1, t:"smooth"},
+   {b:"Berroco", n:"Ultra Alpaca", w:"Worsted", f:{alpaca:50, wool:50}, yds:215, g:100, ga:20, mw:false, p:2, t:"smooth"},
+   {b:"Lily", n:"Sugar'n Cream", w:"Worsted", f:{cotton:100}, yds:120, g:71, ga:18, mw:true, p:1, t:"smooth"},
+   {b:"Cascade", n:"Ultra Pima", w:"DK", f:{cotton:100}, yds:220, g:100, ga:22, mw:true, p:2, t:"smooth"},
+   {b:"Stylecraft", n:"Special DK", w:"DK", f:{acrylic:100}, yds:322, g:100, ga:22, mw:true, p:1, t:"smooth"},
+   {b:"Paintbox", n:"Simply DK", w:"DK", f:{acrylic:100}, yds:302, g:100, ga:22, mw:true, p:1, t:"smooth"},
+   {b:"Drops", n:"Karisma", w:"DK", f:{wool:100}, yds:109, g:50, ga:21, mw:true, p:1, t:"smooth"},
+   {b:"Drops", n:"Merino Extra Fine", w:"DK", f:{merino:100}, yds:114, g:50, ga:21, mw:true, p:1, t:"smooth"},
+   {b:"Sirdar", n:"Snuggly DK", w:"DK", f:{acrylic:55, nylon:45}, yds:179, g:50, ga:22, mw:true, p:1, t:"smooth"},
+   {b:"Rowan", n:"Felted Tweed", w:"DK", f:{wool:50, alpaca:25, polyester:25}, yds:191, g:50, ga:23, mw:false, p:3, t:"tweed"},
+   {b:"Knit Picks", n:"Swish DK", w:"DK", f:{merino:100}, yds:123, g:50, ga:22, mw:true, p:2, t:"smooth"},
+   {b:"Scheepjes", n:"Catona", w:"Sport", f:{cotton:100}, yds:136, g:50, ga:24, mw:true, p:1, t:"smooth"},
+   {b:"Drops", n:"Alpaca", w:"Sport", f:{alpaca:100}, yds:182, g:50, ga:24, mw:false, p:1, t:"smooth"},
+   {b:"Cascade", n:"220 Sport", w:"Sport", f:{wool:100}, yds:164, g:50, ga:24, mw:false, p:2, t:"smooth"},
+   {b:"Knit Picks", n:"Brava Sport", w:"Sport", f:{acrylic:100}, yds:340, g:100, ga:24, mw:true, p:1, t:"smooth"},
+   {b:"Debbie Bliss", n:"Baby Cashmerino", w:"Sport", f:{merino:55, acrylic:33, cashmere:12}, yds:137, g:50, ga:25, mw:true, p:2, t:"smooth"},
+   {b:"Knit Picks", n:"Palette", w:"Fingering", f:{wool:100}, yds:231, g:50, ga:28, mw:false, p:1, t:"smooth"},
+   {b:"Drops", n:"Fabel", w:"Fingering", f:{wool:75, nylon:25}, yds:224, g:50, ga:26, mw:true, p:1, t:"smooth"},
+   {b:"Malabrigo", n:"Sock", w:"Fingering", f:{merino:100}, yds:440, g:100, ga:28, mw:true, p:3, t:"smooth"},
+   {b:"Lion Brand", n:"Sock-Ease", w:"Fingering", f:{wool:75, nylon:25}, yds:438, g:100, ga:28, mw:true, p:1, t:"smooth"},
+   {b:"Cascade", n:"Heritage", w:"Fingering", f:{merino:75, nylon:25}, yds:437, g:100, ga:28, mw:true, p:2, t:"smooth"},
+   {b:"Rowan", n:"Kidsilk Haze", w:"Lace", f:{mohair:70, silk:30}, yds:229, g:25, ga:25, mw:false, p:3, t:"halo"},
+   {b:"Drops", n:"Kid-Silk", w:"Lace", f:{mohair:75, silk:25}, yds:230, g:25, ga:24, mw:false, p:2, t:"halo"},
+   {b:"Malabrigo", n:"Lace", w:"Lace", f:{merino:100}, yds:470, g:50, ga:32, mw:false, p:3, t:"smooth"},
+   {b:"Knit Picks", n:"Shadow", w:"Lace", f:{merino:100}, yds:440, g:50, ga:30, mw:false, p:1, t:"smooth"},
+   {b:"Lion Brand", n:"Wool-Ease Thick & Quick", w:"Super Bulky", f:{acrylic:80, wool:20}, yds:106, g:170, ga:9, mw:true, p:1, t:"smooth"},
+   {b:"Cascade", n:"Magnum", w:"Super Bulky", f:{wool:100}, yds:123, g:250, ga:8, mw:false, p:2, t:"roving"},
+   {b:"Malabrigo", n:"Rasta", w:"Super Bulky", f:{merino:100}, yds:90, g:150, ga:8, mw:false, p:3, t:"roving"},
+   {b:"Bernat", n:"Blanket", w:"Super Bulky", f:{polyester:100}, yds:220, g:300, ga:8, mw:true, p:1, t:"chenille"},
+   {b:"Bernat", n:"Softee Chunky", w:"Bulky", f:{acrylic:100}, yds:108, g:100, ga:13, mw:true, p:1, t:"smooth"},
+   {b:"Drops", n:"Andes", w:"Bulky", f:{wool:65, alpaca:35}, yds:104, g:100, ga:13, mw:false, p:1, t:"smooth"},
+   {b:"Lion Brand", n:"Hue + Me", w:"Bulky", f:{acrylic:80, wool:20}, yds:137, g:125, ga:12, mw:true, p:1, t:"roving"},
+   {b:"Drops", n:"Paris", w:"Aran", f:{cotton:100}, yds:82, g:50, ga:17, mw:true, p:1, t:"smooth"},
+   {b:"Drops", n:"Nepal", w:"Aran", f:{wool:65, alpaca:35}, yds:82, g:50, ga:17, mw:false, p:1, t:"smooth"},
+   {b:"Lion Brand", n:"Heartland", w:"Aran", f:{acrylic:100}, yds:251, g:142, ga:16, mw:true, p:1, t:"smooth"},
   ];
 
   // ---------- helpers ----------
@@ -82,14 +85,17 @@
     .map(([fib,pct]) => `${pct}% ${fib}`).join(", ");
 
   // ---------- scoring ----------
-  // term weights: full-match points per term (weight + thickness + fiber + gauge + care = 100)
+  // term weights: full-match points per term
+  // (weight + thickness + fiber + gauge + texture + care = 100)
   const PTS = {
-    weight: 35,         // same weight class
-    weightAdjacent: 17, // one class away
-    thickness: 25,      // yards-per-gram closeness
-    fiber: 20,          // fiber content overlap
-    gauge: 15,          // stitch-gauge closeness
-    gaugeUnknown: 8,    // neutral credit when the target's gauge isn't known
+    weight: 32,         // same weight class
+    weightAdjacent: 16, // one class away
+    thickness: 22,      // yards-per-gram closeness
+    fiber: 18,          // fiber content overlap
+    gauge: 13,          // stitch-gauge closeness
+    gaugeUnknown: 7,    // neutral credit when the target's gauge isn't known
+    texture: 10,        // surface-texture match
+    textureUnknown: 5,  // neutral credit when the target's texture isn't known
     care: 5,            // not losing machine-washability
   };
   const THICKNESS_SLOPE = 3;     // thickness term reaches 0 at a 33% relative difference
@@ -97,6 +103,23 @@
   const FIBER_EXACT_SHARE = 0.6; // exact-fiber vs fiber-family mix in the fiber term
   const MIN_SCORE = 55;          // candidates scoring below this are hidden
   const MAX_RESULTS = 10;        // show at most this many matches
+
+  // pairwise texture similarity 0..1 (each pair listed once; both orders looked
+  // up). Identical textures score 1; unlisted pairs fall back to 0.4.
+  const TEXTURE_SIM = {
+    "smooth|tweed":0.85, "smooth|chainette":0.75, "smooth|roving":0.6, "smooth|halo":0.25, "smooth|chenille":0.2,
+    "tweed|chainette":0.6, "tweed|roving":0.6, "tweed|halo":0.3, "tweed|chenille":0.2,
+    "chainette|roving":0.55, "chainette|halo":0.3, "chainette|chenille":0.3,
+    "roving|halo":0.45, "roving|chenille":0.35,
+    "halo|chenille":0.2,
+  };
+  // returns 0..1, or null when texture is unknown on either side
+  function textureSimilarity(t1, t2) {
+    if (!t1 || !t2) return null;
+    if (t1 === t2) return 1;
+    const sim = TEXTURE_SIM[`${t1}|${t2}`] ?? TEXTURE_SIM[`${t2}|${t1}`];
+    return sim === undefined ? 0.4 : sim;
+  }
 
   // relative thickness difference, symmetric: measured against the mean of the
   // two values so A-vs-B always equals B-vs-A
@@ -134,6 +157,10 @@
     // fiber
     pts += fiberSimilarity(target, cand) * PTS.fiber / 100;
 
+    // texture: neutral credit when the target's texture is unknown (custom specs)
+    const tsim = textureSimilarity(target.t, cand.t);
+    pts += tsim === null ? PTS.textureUnknown : PTS.texture * tsim;
+
     // care: only penalize losing machine-washability
     pts += (target.mw && !cand.mw) ? 0 : PTS.care;
 
@@ -147,6 +174,11 @@
     bits.push(d <= 5 ? "nearly identical thickness" : `${d}% thickness difference`);
     const fiber = fiberSimilarity(target, cand);              // same measure score() uses
     bits.push(fiber >= 75 ? "similar fiber character" : "different fiber character — drape will change");
+    const tsim = textureSimilarity(target.t, cand.t);        // same measure score() uses
+    if (tsim !== null) {
+      if (tsim === 1 && cand.t !== "smooth") bits.push(`matching ${cand.t} texture`);
+      else if (tsim < 0.6) bits.push(`${cand.t} texture — look will change`);
+    }
     if (target.mw && !cand.mw) bits.push("NOT machine washable");
     return bits.join(" · ");
   }
@@ -169,10 +201,10 @@
 
   // ---------- exports ----------
   const YarnSwap = {
-    WEIGHTS, FIBERS, FAMILY, YARNS,
-    PTS, THICKNESS_SLOPE, GAUGE_SLOPE, FIBER_EXACT_SHARE, MIN_SCORE, MAX_RESULTS,
+    WEIGHTS, FIBERS, FAMILY, TEXTURES, YARNS,
+    PTS, THICKNESS_SLOPE, GAUGE_SLOPE, FIBER_EXACT_SHARE, MIN_SCORE, MAX_RESULTS, TEXTURE_SIM,
     escapeHtml, ypg, famPct, fiberLabel,
-    thicknessDiff, fiberSimilarity, score, whyText, displayScore, buyLinks,
+    thicknessDiff, fiberSimilarity, textureSimilarity, score, whyText, displayScore, buyLinks,
   };
 
   if (typeof module !== "undefined" && module.exports) module.exports = YarnSwap;
