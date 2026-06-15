@@ -131,6 +131,27 @@ test("custom (textureless) target gets neutral texture credit, never full or zer
   assert.ok(Number.isFinite(sSmooth) && Number.isFinite(sHalo));
 });
 
+test("swatchColor returns a valid hex tied to fiber family", () => {
+  const hex = /^#[0-9a-f]{6}$/;
+  for (const y of Y.YARNS) assert.match(Y.swatchColor(y), hex, `${y.b} ${y.n}`);
+  // pure-fiber yarns map to the exact family anchor colours
+  assert.equal(Y.swatchColor({ f: { wool: 100 } }), "#b67854");   // animal anchor
+  assert.equal(Y.swatchColor({ f: { cotton: 100 } }), "#7aa06c");  // plant anchor
+  assert.equal(Y.swatchColor({ f: { acrylic: 100 } }), "#688ab2"); // synthetic anchor
+  // a blend lands between its family anchors (not equal to either)
+  const blend = Y.swatchColor({ f: { acrylic: 80, wool: 20 } });
+  assert.notEqual(blend, "#688ab2");
+  assert.notEqual(blend, "#b67854");
+});
+
+test("verified corrections are in place", () => {
+  const sirdar = find("Sirdar", "Snuggly DK");
+  assert.deepEqual(sirdar.f, { nylon: 55, acrylic: 45 }); // was acrylic/nylon, corrected
+  const catona = find("Scheepjes", "Catona");
+  assert.equal(catona.yds, 137);
+  assert.equal(catona.ga, 26);
+});
+
 // ---------- known-substitution fixtures ----------
 // Sanity anchors for the heuristic. Full validation against expert-curated
 // substitutions is tracker task 22 (still needs human sign-off); these lock in

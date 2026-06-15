@@ -40,10 +40,10 @@
    {b:"Paintbox", n:"Simply DK", w:"DK", f:{acrylic:100}, yds:302, g:100, ga:22, mw:true, p:1, t:"smooth"},
    {b:"Drops", n:"Karisma", w:"DK", f:{wool:100}, yds:109, g:50, ga:21, mw:true, p:1, t:"smooth"},
    {b:"Drops", n:"Merino Extra Fine", w:"DK", f:{merino:100}, yds:114, g:50, ga:21, mw:true, p:1, t:"smooth"},
-   {b:"Sirdar", n:"Snuggly DK", w:"DK", f:{acrylic:55, nylon:45}, yds:179, g:50, ga:22, mw:true, p:1, t:"smooth"},
+   {b:"Sirdar", n:"Snuggly DK", w:"DK", f:{nylon:55, acrylic:45}, yds:179, g:50, ga:22, mw:true, p:1, t:"smooth"},
    {b:"Rowan", n:"Felted Tweed", w:"DK", f:{wool:50, alpaca:25, polyester:25}, yds:191, g:50, ga:23, mw:false, p:3, t:"tweed"},
    {b:"Knit Picks", n:"Swish DK", w:"DK", f:{merino:100}, yds:123, g:50, ga:22, mw:true, p:2, t:"smooth"},
-   {b:"Scheepjes", n:"Catona", w:"Sport", f:{cotton:100}, yds:136, g:50, ga:24, mw:true, p:1, t:"smooth"},
+   {b:"Scheepjes", n:"Catona", w:"Sport", f:{cotton:100}, yds:137, g:50, ga:26, mw:true, p:1, t:"smooth"},
    {b:"Drops", n:"Alpaca", w:"Sport", f:{alpaca:100}, yds:182, g:50, ga:24, mw:false, p:1, t:"smooth"},
    {b:"Cascade", n:"220 Sport", w:"Sport", f:{wool:100}, yds:164, g:50, ga:24, mw:false, p:2, t:"smooth"},
    {b:"Knit Picks", n:"Brava Sport", w:"Sport", f:{acrylic:100}, yds:340, g:100, ga:24, mw:true, p:1, t:"smooth"},
@@ -83,6 +83,29 @@
   };
   const fiberLabel = f => Object.entries(f).sort((a,b)=>b[1]-a[1])
     .map(([fib,pct]) => `${pct}% ${fib}`).join(", ");
+
+  // representative swatch colour for a yarn's result card. This is a fiber-FAMILY
+  // indicator (warm = animal, green = plant, blue = synthetic), blended by the
+  // yarn's blend proportions — not a claim about any specific colorway. It gives
+  // the cards a yarn-toned palette while encoding real, scannable information.
+  const FAMILY_COLOR = { animal:[182,120,84], plant:[122,160,108], synthetic:[104,138,178] };
+  function swatchColor(y) {
+    const fam = famPct(y.f);                 // {animal, plant, synthetic}, sums to 100
+    let r = 0, g = 0, b = 0;
+    for (const k of ["animal","plant","synthetic"]) {
+      const w = fam[k] / 100;
+      r += FAMILY_COLOR[k][0] * w; g += FAMILY_COLOR[k][1] * w; b += FAMILY_COLOR[k][2] * w;
+    }
+    const hex = n => Math.round(n).toString(16).padStart(2, "0");
+    return `#${hex(r)}${hex(g)}${hex(b)}`;
+  }
+
+  // When the dataset was last spot-checked against manufacturer/retailer specs.
+  // Spot-checked June 2026: Cascade 220, Malabrigo Rios, Lion Brand Wool-Ease,
+  // Caron Simply Soft, Red Heart Super Saver, Stylecraft Special DK, Bernat
+  // Blanket, Scheepjes Catona, Sirdar Snuggly DK (the last two corrected). Specs
+  // remain approximate/per-ball — full per-record sign-off is tracker task 30.
+  const SPECS_REVIEWED = "June 2026";
 
   // ---------- scoring ----------
   // term weights: full-match points per term
@@ -201,9 +224,9 @@
 
   // ---------- exports ----------
   const YarnSwap = {
-    WEIGHTS, FIBERS, FAMILY, TEXTURES, YARNS,
+    WEIGHTS, FIBERS, FAMILY, TEXTURES, YARNS, SPECS_REVIEWED,
     PTS, THICKNESS_SLOPE, GAUGE_SLOPE, FIBER_EXACT_SHARE, MIN_SCORE, MAX_RESULTS, TEXTURE_SIM,
-    escapeHtml, ypg, famPct, fiberLabel,
+    escapeHtml, ypg, famPct, fiberLabel, swatchColor,
     thicknessDiff, fiberSimilarity, textureSimilarity, score, whyText, displayScore, buyLinks,
   };
 
