@@ -1,0 +1,99 @@
+:root {
+  --bg: #faf7f2;
+  --card: #ffffff;
+  --ink: #2d2a26;
+  --muted: #6a6359;
+  --accent: #b5485d;
+  --accent-soft: #f6e3e7;
+  --good: #2e7d52;
+  --ok: #8a6120;
+  --border: #e7e0d6;
+  --radius: 12px;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.5;
+}
+header {
+  background: var(--accent);
+  color: #fff;
+  padding: 28px 20px 22px;
+  text-align: center;
+}
+header h1 { margin: 0; font-size: 1.9rem; font-weight: normal; letter-spacing: .5px; }
+header p { margin: 6px 0 0; opacity: .9; font-style: italic; }
+main { max-width: 980px; margin: 0 auto; padding: 24px 16px 60px; }
+
+.panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+.tabs { display: flex; gap: 8px; margin-bottom: 18px; }
+.tabs button {
+  flex: 1; padding: 10px; font-family: inherit; font-size: 1rem;
+  border: 1px solid var(--border); background: var(--bg);
+  border-radius: 8px; cursor: pointer; color: var(--muted);
+}
+.tabs button.active { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: bold; }
+
+label { display: block; font-size: .85rem; color: var(--muted); margin-bottom: 4px; }
+select, input[type=number], input[type=text] {
+  width: 100%; padding: 9px 10px; font-family: inherit; font-size: 1rem;
+  border: 1px solid var(--border); border-radius: 8px; background: #fff; color: var(--ink);
+}
+.grid { display: grid; gap: 14px; }
+.grid.cols3 { grid-template-columns: repeat(3, 1fr); }
+.grid.cols4 { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 700px) { .grid.cols3, .grid.cols4 { grid-template-columns: 1fr 1fr; } }
+
+.check { display: flex; align-items: center; gap: 8px; font-size: .95rem; color: var(--ink); margin-top: 22px; }
+.check input { width: auto; }
+
+.findbtn {
+  margin-top: 18px; width: 100%; padding: 13px; font-family: inherit; font-size: 1.1rem;
+  background: var(--accent); color: #fff; border: none; border-radius: 8px; cursor: pointer;
+}
+.findbtn:hover { filter: brightness(1.08); }
+
+.results-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; }
+.results-head h2 { font-weight: normal; font-size: 1.3rem; margin: 0 0 12px; }
+.results-head .basis { font-size: .85rem; color: var(--muted); font-style: italic; }
+.results-meta { font-size: .8rem; color: var(--muted); margin: -4px 0 14px; }
+
+.card {
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 16px 18px; margin-bottom: 14px;
+  display: grid; grid-template-columns: 70px 1fr auto; gap: 16px; align-items: start;
+}
+@media (max-width: 700px) { .card { grid-template-columns: 60px 1fr; } .buylinks { grid-column: 1 / -1; } }
+.score {
+  width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 1.05rem; font-weight: bold; color: #fff;
+}
+.score.great { background: var(--good); }
+.score.good { background: var(--ok); }
+.card h3 { margin: 0 0 2px; font-size: 1.15rem; font-weight: bold; }
+.card .brand { color: var(--muted); font-size: .9rem; }
+.specs { margin: 8px 0 0; font-size: .88rem; color: var(--ink); }
+.specs span { display: inline-block; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; margin: 2px 4px 2px 0; }
+.why { margin-top: 8px; font-size: .85rem; color: var(--muted); font-style: italic; }
+.buylinks { display: flex; flex-direction: column; gap: 6px; min-width: 130px; }
+.buylinks a {
+  font-size: .85rem; text-decoration: none; color: var(--accent);
+  border: 1px solid var(--accent); border-radius: 6px; padding: 5px 10px; text-align: center;
+}
+.buylinks a:hover { background: var(--accent); color: #fff; }
+.empty { text-align: center; color: var(--muted); font-style: italic; padding: 30px 0; }
+.errs { border-color: var(--accent); }
+.errs h2 { font-size: 1.05rem; font-weight: bold; margin: 0 0 8px; color: var(--accent); }
+.errs ul { margin: 0; padding-left: 20px; font-size: .9rem; }
+.errs li { margin: 2px 0; }
+input.invalid { border-color: var(--accent); background: var(--accent-soft); }
+.note { font-size: .8rem; color: var(--muted); margin-top: 30px; text-align: center; }
