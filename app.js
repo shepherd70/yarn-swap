@@ -16,6 +16,7 @@
 
   // ---------- tabs ----------
   let tab = "pick";
+  let hasSearched = false;   // gate live re-runs until the first explicit search
   function setTab(t) {
     tab = t;
     const pick = t === "pick";
@@ -74,6 +75,68 @@
       t: $("sTexture").value || undefined,   // "" → unknown → neutral texture credit
       mw: $("sWash").checked,
     };
+  }
+
+  // ---------- shareable URL state ----------
+  // Encode the current query into the URL hash so a result page can be linked,
+  // bookmarked, and restored on load.
+  function collectState() {
+    const p = new URLSearchParams();
+    p.set("m", tab);
+    if (tab === "pick") {
+      const y = YARNS[+$("yarnSelect").value];
+      p.set("y", `${y.b}|${y.n}`);
+    } else {
+      p.set("w", $("sWeight").value);
+      p.set("yds", $("sYds").value);
+      p.set("g", $("sGrams").value);
+      if ($("sGauge").value) p.set("ga", $("sGauge").value);
+      p.set("f", $("sFiber").value);
+      p.set("pct", $("sFiberPct").value);
+      if ($("sFiber2").value) p.set("f2", $("sFiber2").value);
+      if ($("sTexture").value) p.set("tx", $("sTexture").value);
+      p.set("mw", $("sWash").checked ? "1" : "0");
+    }
+    p.set("care", $("fWash").value);
+    p.set("price", $("fPrice").value);
+    p.set("fam", $("fFam").value);
+    return p.toString();
+  }
+
+  // Restore controls from a hash string. Returns true if any state was applied.
+  function applyState(str) {
+    const p = new URLSearchParams(str);
+    if (![...p.keys()].length) return false;
+    setTab(p.get("m") === "specs" ? "specs" : "pick");
+    if (tab === "pick") {
+      const i = YARNS.findIndex(y => `${y.b}|${y.n}` === (p.get("y") || ""));
+      if (i >= 0) $("yarnSelect").value = String(i);
+    } else {
+      const set = (id, key) => { const v = p.get(key); if (v !== null) $(id).value = v; };
+      set("sWeight", "w"); set("sYds", "yds"); set("sGrams", "g");
+      $("sGauge").value = p.get("ga") || "";
+      set("sFiber", "f"); set("sFiberPct", "pct");
+      $("sFiber2").value = p.get("f2") || "";
+      $("sTexture").value = p.get("tx") || "";
+      $("sWash").checked = p.get("mw") === "1";
+    }
+    const setf = (id, key) => { const v = p.get(key); if (v !== null) $(id).value = v; };
+    setf("fWash", "care"); setf("fPrice", "price"); setf("fFam", "fam");
+    return true;
+  }
+
+  async function copyLink() {
+    const url = location.href;
+    try { await navigator.clipboard.writeText(url); return true; }
+    catch {
+      try {
+        const ta = document.createElement("textarea");
+        ta.value = url; ta.setAttribute("readonly", "");
+        ta.style.position = "absolute"; ta.style.left = "-9999px";
+        document.body.appendChild(ta); ta.select();
+        const ok = document.execCommand("copy"); ta.remove(); return ok;
+      } catch { return false; }
+    }
   }
 
   // ---------- rendering ----------
@@ -139,6 +202,9 @@
     const price = $("fPrice").value;
     const fam = $("fFam").value;
 
+    history.replaceState(null, "", "#" + collectState());
+    hasSearched = true;
+
     const scored = YARNS
       .filter(y => !(tab === "pick" && y === target))
       .filter(y => wash !== "machine" || y.mw)
@@ -159,15 +225,17 @@
         : `No candidates match these filters. Try loosening the filters.`}</div>`;
       return;
     }
-    const metaBits = [];
+    const metaBits = [`for ${basis}`];
     if (passing.length > rows.length) metaBits.push(`showing the top ${rows.length} of ${passing.length} matches`);
     if (belowBar > 0) metaBits.push(`${belowBar} candidate${belowBar > 1 ? "s" : ""} below the ${MIN_SCORE}-point quality bar hidden`);
     el.innerHTML = `
       <div class="results-head">
         <h2>${rows.length} substitute${rows.length > 1 ? "s" : ""} found</h2>
-        <span class="basis">for ${basis}</span>
-      </div>` +
-      (metaBits.length ? `<p class="results-meta">${metaBits.join(" · ")}</p>` : "") +
+        <div class="results-actions">
+          <button type="button" class="copybtn">Copy link</button>
+        </div>
+      </div>
+      <p class="results-meta">${metaBits.join(" · ")}</p>` +
       `<div class="cards">${rows.map(({ y, s }) => cardHtml(y, s)).join("")}</div>`;
   }
 
@@ -205,6 +273,29 @@
       $(next === "pick" ? "tabPick" : "tabSpecs").focus();
     });
     $("findBtn").addEventListener("click", findSubs);
+
+    // live-feel: once the user has run a search, re-run as they tweak controls
+    let debounce;
+    const live = () => { if (!hasSearched) return; clearTimeout(debounce); debounce = setTimeout(findSubs, 250); };
+    ["yarnSelect","sWeight","sYds","sGrams","sGauge","sFiber","sFiberPct","sFiber2","sTexture","sWash","fWash","fPrice","fFam"]
+      .forEach(id => {
+        const el = $(id);
+        el.addEventListener("change", live);
+        if (el.tagName === "INPUT" && el.type === "number") el.addEventListener("input", live);
+      });
+
+    // copy-link button (delegated so it survives re-renders)
+    $("results").addEventListener("click", async e => {
+      const btn = e.target.closest(".copybtn");
+      if (!btn) return;
+      const ok = await copyLink();
+      btn.classList.toggle("copied", ok);
+      btn.textContent = ok ? "Link copied!" : "Press Ctrl+C to copy";
+      setTimeout(() => { btn.classList.remove("copied"); btn.textContent = "Copy link"; }, 1800);
+    });
+
+    // restore a shared/bookmarked query from the URL hash and show it immediately
+    if (applyState(location.hash.replace(/^#/, ""))) findSubs();
   }
 
   document.addEventListener("DOMContentLoaded", init);

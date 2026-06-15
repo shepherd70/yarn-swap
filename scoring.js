@@ -212,20 +212,29 @@
   const displayScore = s => Math.min(s, 99);
 
   // ---------- buy links ----------
-  // per-retailer query tuning: Amazon gets an extra "yarn" keyword to disambiguate
+  // Per-retailer query tuning: Amazon gets an extra "yarn" keyword to disambiguate
   // against its general catalog; LoveCrafts/Hobbii search yarn-only catalogs already.
+  // `affiliate` is appended as a query param when set — drop in real tags here.
+  // NOTE: real affiliate integration differs per network (Amazon Associates uses
+  // ?tag=...; LoveCrafts/Hobbii run through Awin links). This slot is the hook.
+  const RETAILERS = [
+    { name: "LoveCrafts", search: q => `https://www.lovecrafts.com/en-us/search?term=${q}`, affiliate: "" },
+    { name: "Hobbii",     search: q => `https://hobbii.com/catalogsearch/result/?q=${q}`,    affiliate: "" },
+    { name: "Amazon",     search: q => `https://www.amazon.com/s?k=${q}+yarn`,               affiliate: "" }, // e.g. "tag=yourid-20"
+  ];
   function buyLinks(y) {
     const q = encodeURIComponent(`${y.b} ${y.n}`);
-    return `
-      <a target="_blank" rel="noopener" href="https://www.lovecrafts.com/en-us/search?term=${q}">LoveCrafts</a>
-      <a target="_blank" rel="noopener" href="https://hobbii.com/catalogsearch/result/?q=${q}">Hobbii</a>
-      <a target="_blank" rel="noopener" href="https://www.amazon.com/s?k=${q}+yarn">Amazon</a>`;
+    return RETAILERS.map(r => {
+      let url = r.search(q);
+      if (r.affiliate) url += (url.includes("?") ? "&" : "?") + r.affiliate;
+      return `<a target="_blank" rel="noopener" href="${url}">${r.name}</a>`;
+    }).join("");
   }
 
   // ---------- exports ----------
   const YarnSwap = {
     WEIGHTS, FIBERS, FAMILY, TEXTURES, YARNS, SPECS_REVIEWED,
-    PTS, THICKNESS_SLOPE, GAUGE_SLOPE, FIBER_EXACT_SHARE, MIN_SCORE, MAX_RESULTS, TEXTURE_SIM,
+    PTS, THICKNESS_SLOPE, GAUGE_SLOPE, FIBER_EXACT_SHARE, MIN_SCORE, MAX_RESULTS, TEXTURE_SIM, RETAILERS,
     escapeHtml, ypg, famPct, fiberLabel, swatchColor,
     thicknessDiff, fiberSimilarity, textureSimilarity, score, whyText, displayScore, buyLinks,
   };
