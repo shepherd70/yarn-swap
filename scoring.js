@@ -67,6 +67,30 @@
    {b:"Drops", n:"Paris", w:"Aran", f:{cotton:100}, yds:82, g:50, ga:17, mw:true, p:1, t:"smooth"},
    {b:"Drops", n:"Nepal", w:"Aran", f:{wool:65, alpaca:35}, yds:82, g:50, ga:17, mw:false, p:1, t:"smooth"},
    {b:"Lion Brand", n:"Heartland", w:"Aran", f:{acrylic:100}, yds:251, g:142, ga:16, mw:true, p:1, t:"smooth"},
+
+   // ---- June 2026 focused gap-fill --------------------------------------------------
+   // Fills options that were selectable in the UI but matched zero yarns (linen,
+   // bamboo, chainette) plus chenille depth and Aran/cashmere/Bulky depth. Specs
+   // sourced June 2026 (approximate/per-ball, pending task-30 sign-off):
+   //   Quince & Co Sparrow ......... yarnsub.com (100% linen, fingering, mach. wash 30C)
+   //   Rowan Creative Linen ........ yarnsub.com (cotton/linen, DK, hand wash)
+   //   Lion Brand Truboo ........... lionbrand.com (rayon-from-bamboo, DK, mach. wash)
+   //   Lion Brand Coboo ............ yarnsub.com (bamboo/cotton, DK, mach. wash 40C)
+   //   Knit Picks Comfy Worsted .... yarnsub.com specs; chainette per Knit Picks product desc.
+   //   Debbie Bliss Cashmerino Aran  yarnsub.com (33% microfiber recorded as acrylic,
+   //                                 matching the existing Baby Cashmerino sibling)
+   //   Bernat Velvet ............... yarnspirations.com (#5 bulky, hand wash)
+   //   Bernat Baby Blanket ......... yarnspirations.com (#6 super bulky chenille, 100g/72yd,
+   //                                 machine wash) — a same-weight match for Bernat Blanket
+   //                                 (near-twin, like Cascade 220 vs 220 Superwash)
+   {b:"Quince & Co", n:"Sparrow", w:"Fingering", f:{linen:100}, yds:170, g:50, ga:24, mw:true, p:2, t:"smooth"},
+   {b:"Rowan", n:"Creative Linen", w:"DK", f:{cotton:50, linen:50}, yds:219, g:100, ga:21, mw:false, p:2, t:"smooth"},
+   {b:"Lion Brand", n:"Truboo", w:"DK", f:{bamboo:100}, yds:241, g:100, ga:23, mw:true, p:1, t:"smooth"},
+   {b:"Lion Brand", n:"Coboo", w:"DK", f:{bamboo:50, cotton:50}, yds:232, g:100, ga:23, mw:true, p:1, t:"smooth"},
+   {b:"Knit Picks", n:"Comfy Worsted", w:"Worsted", f:{cotton:75, acrylic:25}, yds:109, g:50, ga:19, mw:true, p:1, t:"chainette"},
+   {b:"Debbie Bliss", n:"Cashmerino Aran", w:"Aran", f:{merino:55, acrylic:33, cashmere:12}, yds:98, g:50, ga:18, mw:true, p:2, t:"smooth"},
+   {b:"Bernat", n:"Velvet", w:"Bulky", f:{polyester:100}, yds:315, g:300, ga:12, mw:false, p:1, t:"chenille"},
+   {b:"Bernat", n:"Baby Blanket", w:"Super Bulky", f:{polyester:100}, yds:72, g:100, ga:8, mw:true, p:1, t:"chenille"},
   ];
 
   // ---------- helpers ----------
@@ -103,8 +127,9 @@
   // When the dataset was last spot-checked against manufacturer/retailer specs.
   // Spot-checked June 2026: Cascade 220, Malabrigo Rios, Lion Brand Wool-Ease,
   // Caron Simply Soft, Red Heart Super Saver, Stylecraft Special DK, Bernat
-  // Blanket, Scheepjes Catona, Sirdar Snuggly DK (the last two corrected). Specs
-  // remain approximate/per-ball — full per-record sign-off is tracker task 30.
+  // Blanket, Scheepjes Catona, Sirdar Snuggly DK (the last two corrected). The
+  // June 2026 gap-fill block below was sourced from manufacturer pages / yarnsub.com
+  // as it was added. Specs remain approximate/per-ball — full sign-off is task 30.
   const SPECS_REVIEWED = "June 2026";
 
   // ---------- scoring ----------

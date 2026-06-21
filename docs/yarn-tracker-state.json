@@ -61,7 +61,7 @@
   },
   "16": {
     "status": "complete",
-    "notes": "Empty-state and below-quality-bar messaging rendered when no candidates pass; styled error panel for invalid specs."
+    "notes": "Empty-state and below-quality-bar messaging rendered when no candidates pass; styled error panel for invalid specs. June 2026: added a 'stretch match' reveal — when fewer than 3 candidates clear the 55-point bar, the best 1-2 just-below-bar candidates (>=40) render as de-emphasized, clearly-labelled stretch cards (dashed border, muted ring) instead of only a hidden count; turns thin/empty results into actionable options."
   },
   "17": {
     "status": "complete",
@@ -73,7 +73,7 @@
   },
   "19": {
     "status": "in-progress",
-    "notes": "DB at 45 yarns; thin classes filled out. Remaining: broaden coverage further and verify every legacy record against ball-band data (see task 30)."
+    "notes": "DB expanded to 53 (June 2026 focused gap-fill, sourced from manufacturer pages / yarnsub.com): linen (Quince Sparrow, Rowan Creative Linen), bamboo (Lion Brand Truboo, Coboo), chainette (Knit Picks Comfy Worsted), more chenille (Bernat Velvet; Bernat Baby Blanket as a same-weight match for Bernat Blanket, a near-twin like Cascade 220 vs 220 Superwash), plus Aran/cashmere (Debbie Bliss Cashmerino Aran) and Bulky depth. linen/bamboo/chainette were selectable in the UI but matched zero yarns before; now guarded by a test. Broader expansion deferred by choice; legacy per-record verification remains task 30."
   },
   "20": {
     "status": "complete",
@@ -109,11 +109,11 @@
   },
   "28": {
     "status": "in-progress",
-    "notes": "Verified in headless Edge/Chromium (initial + results). Firefox and Safari still need a manual pass (Safari unavailable on the dev machine)."
+    "notes": "Verified in headless Edge/Chromium and Firefox 152 (Gecko), June 2026 — full result render incl. score-ring + swatch SVG, spec pills, buy-links, and the new yarn records; reduced-motion path also confirmed. Only Safari (WebKit) remains, and it is Mac-only so it stays with the user."
   },
   "29": {
-    "status": "in-progress",
-    "notes": "Automated tests exercise scoring edge cases (weight-gap exclusion, symmetry, unknown gauge/texture credit, self-score). Manual UI extremes (Lace/Super Bulky targets, partial-fiber custom specs) still to do."
+    "status": "complete",
+    "notes": "Automated tests cover scoring edge cases. Manual UI extremes verified June 2026 via headless-Edge renders: Lace + Super Bulky (both weight boundaries), full 10-card specs result, displayScore 99-cap, empty/below-bar state, and partial-fiber custom specs (unknown secondary/gauge/texture). Reduced-motion render path also confirmed. Interactive cross-browser rolls into task 28/34."
   },
   "30": {
     "status": "not-started",

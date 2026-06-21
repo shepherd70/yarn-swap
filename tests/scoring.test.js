@@ -9,8 +9,8 @@ const yarn = (over = {}) => ({
   yds: 200, g: 100, ga: 20, mw: false, p: 2, ...over,
 });
 
-test("dataset integrity: 45 records, all internally valid", () => {
-  assert.equal(Y.YARNS.length, 45);
+test("dataset integrity: 53 records, all internally valid", () => {
+  assert.equal(Y.YARNS.length, 53);
   for (const y of Y.YARNS) {
     const sum = Object.values(y.f).reduce((s, v) => s + v, 0);
     assert.equal(sum, 100, `${y.b} ${y.n} fiber blend must sum to 100 (got ${sum})`);
@@ -28,6 +28,15 @@ const find = (b, n) => {
   assert.ok(y, `fixture yarn not found: ${b} ${n}`);
   return y;
 };
+
+test("gap-fill: linen, bamboo, and chainette are represented (were selectable but empty)", () => {
+  const hasFiber = fib => Y.YARNS.some(y => (y.f[fib] || 0) > 0);
+  assert.ok(hasFiber("linen"), "expected at least one linen yarn");
+  assert.ok(hasFiber("bamboo"), "expected at least one bamboo yarn");
+  assert.ok(Y.YARNS.some(y => y.t === "chainette"), "expected at least one chainette-texture yarn");
+  // a 2nd chenille so the Super Bulky chenille (Bernat Blanket) has an in-texture neighbour
+  assert.ok(Y.YARNS.filter(y => y.t === "chenille").length >= 2, "expected at least two chenille yarns");
+});
 
 test("a yarn scores a perfect 100 against itself", () => {
   for (const y of Y.YARNS) assert.equal(Y.score(y, y), 100, `${y.b} ${y.n}`);
