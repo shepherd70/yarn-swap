@@ -215,6 +215,13 @@ fieldset { border: 0; margin: 0; padding: 0; }
 .pills li.cap { text-transform: capitalize; }
 .why { margin: 12px 0 0; font-size: .88rem; color: var(--ink-2); font-style: italic; }
 
+/* stretch matches — close in character but below the quality bar, shown de-emphasised */
+.stretch-block { margin-top: 20px; border-top: 1px dashed var(--line); }
+.stretch-head { font-size: .84rem; color: var(--ink-2); font-style: italic; margin: 16px 0 12px; }
+.stretch-block .card { border-style: dashed; box-shadow: none; }
+.ring-val.stretch { stroke: var(--ink-2); opacity: .55; }
+.match-label.stretch { color: var(--ink-2); }
+
 .buys { display: flex; flex-direction: column; gap: 7px; }
 .buys-label { font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); font-weight: 700; margin-bottom: 1px; }
 .buys a {

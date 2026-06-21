@@ -154,9 +154,10 @@
     return `<svg class="swatch" width="13" height="13" viewBox="0 0 13 13" aria-hidden="true"><circle cx="6.5" cy="6.5" r="6.5" fill="${swatchColor(y)}"></circle></svg>`;
   }
 
-  function cardHtml(y, s) {
+  function cardHtml(y, s, stretch) {
     const d = displayScore(s);
-    const tier = s >= 80 ? "great" : "good";
+    const tier = stretch ? "stretch" : (s >= 80 ? "great" : "good");
+    const label = stretch ? "Stretch match" : (s >= 80 ? "Excellent match" : "Good match");
     const name = escapeHtml(`${y.b} ${y.n}`);
     const target = currentTarget;
     return `<article class="card">
@@ -164,7 +165,7 @@
       <div class="card-main">
         <div class="card-top">
           <h3>${name}</h3>
-          <span class="match-label ${tier}">${tier === "great" ? "Excellent match" : "Good match"}</span>
+          <span class="match-label ${tier}">${label}</span>
         </div>
         <p class="fiber">${swatchSvg(y)}<span>${escapeHtml(fiberLabel(y.f))}</span></p>
         <ul class="pills">
@@ -217,26 +218,57 @@
     const rows = passing.slice(0, MAX_RESULTS);
     const belowBar = scored.length - passing.length;
 
+    // When very few candidates clear the quality bar, reveal the best one or two
+    // that fell just short as clearly-labelled "stretch" matches — more useful than
+    // hiding the closest-in-character yarn behind a count. Purely presentational:
+    // no scores change, and only candidates within reach of the bar are shown.
+    const STRETCH_TRIGGER = 3, STRETCH_MAX = 2, STRETCH_FLOOR = 40;
+    const stretch = rows.length < STRETCH_TRIGGER
+      ? scored.slice(passing.length, passing.length + STRETCH_MAX).filter(r => r.s >= STRETCH_FLOOR)
+      : [];
+
     const el = $("results");
     const basis = escapeHtml(`${target.b} ${target.n} — ${target.w}, ${fiberLabel(target.f)}, ${target.yds} yds / ${target.g} g`);
-    if (!rows.length) {
+
+    if (!rows.length && !stretch.length) {
       el.innerHTML = `<div class="panel state state-empty">${belowBar
         ? `${belowBar} candidate${belowBar > 1 ? "s" : ""} matched your filters but scored below the ${MIN_SCORE}-point quality bar. Try loosening the filters.`
         : `No candidates match these filters. Try loosening the filters.`}</div>`;
       return;
     }
-    const metaBits = [`for ${basis}`];
-    if (passing.length > rows.length) metaBits.push(`showing the top ${rows.length} of ${passing.length} matches`);
-    if (belowBar > 0) metaBits.push(`${belowBar} candidate${belowBar > 1 ? "s" : ""} below the ${MIN_SCORE}-point quality bar hidden`);
-    el.innerHTML = `
-      <div class="results-head">
-        <h2>${rows.length} substitute${rows.length > 1 ? "s" : ""} found</h2>
-        <div class="results-actions">
-          <button type="button" class="copybtn">Copy link</button>
+
+    const stretchBlock = stretch.length ? `
+      <div class="stretch-block">
+        <p class="stretch-head">Below our ${MIN_SCORE}-point bar — close in character, but swatch carefully:</p>
+        <div class="cards">${stretch.map(({ y, s }) => cardHtml(y, s, true)).join("")}</div>
+      </div>` : "";
+
+    if (rows.length) {
+      const metaBits = [`for ${basis}`];
+      if (passing.length > rows.length) metaBits.push(`showing the top ${rows.length} of ${passing.length} matches`);
+      const hidden = belowBar - stretch.length;
+      if (hidden > 0) metaBits.push(`${hidden} more below the ${MIN_SCORE}-point quality bar hidden`);
+      el.innerHTML = `
+        <div class="results-head">
+          <h2>${rows.length} substitute${rows.length > 1 ? "s" : ""} found</h2>
+          <div class="results-actions">
+            <button type="button" class="copybtn">Copy link</button>
+          </div>
         </div>
-      </div>
-      <p class="results-meta">${metaBits.join(" · ")}</p>` +
-      `<div class="cards">${rows.map(({ y, s }) => cardHtml(y, s)).join("")}</div>`;
+        <p class="results-meta">${metaBits.join(" · ")}</p>
+        <div class="cards">${rows.map(({ y, s }) => cardHtml(y, s)).join("")}</div>
+        ${stretchBlock}`;
+    } else {
+      el.innerHTML = `
+        <div class="results-head">
+          <h2>No strong matches found</h2>
+          <div class="results-actions">
+            <button type="button" class="copybtn">Copy link</button>
+          </div>
+        </div>
+        <p class="results-meta">for ${basis} · showing the ${stretch.length} closest${belowBar > stretch.length ? ` of ${belowBar}` : ""} below the ${MIN_SCORE}-point bar</p>
+        ${stretchBlock}`;
+    }
   }
 
   // ---------- init ----------
