@@ -13,9 +13,9 @@
   // b: brand, n: name, w: weight class, f: fiber %s, yds/g: per ball,
   // ga: typical sts per 4in, mw: machine washable, p: price tier 1-3
   const WEIGHTS = ["Lace","Fingering","Sport","DK","Worsted","Aran","Bulky","Super Bulky"];
-  const FIBERS = ["wool","merino","alpaca","mohair","silk","cashmere","cotton","linen","bamboo","acrylic","nylon","polyester"];
+  const FIBERS = ["wool","merino","alpaca","mohair","silk","cashmere","cotton","linen","bamboo","viscose","acrylic","nylon","polyester"];
   const FAMILY = { wool:"animal", merino:"animal", alpaca:"animal", mohair:"animal", silk:"animal", cashmere:"animal",
-                   cotton:"plant", linen:"plant", bamboo:"plant",
+                   cotton:"plant", linen:"plant", bamboo:"plant", viscose:"plant",
                    acrylic:"synthetic", nylon:"synthetic", polyester:"synthetic" };
   // surface texture — drives the texture term in score() (mohair halo vs a smooth
   // plied yarn knit up very differently even at the same weight and fiber).
@@ -28,20 +28,20 @@
    {b:"Knit Picks", n:"Wool of the Andes", w:"Worsted", f:{wool:100}, yds:110, g:50, ga:19, mw:false, p:1, t:"smooth"},
    {b:"Malabrigo", n:"Rios", w:"Worsted", f:{merino:100}, yds:210, g:100, ga:18, mw:true, p:3, t:"smooth"},
    {b:"Lion Brand", n:"Wool-Ease", w:"Worsted", f:{acrylic:80, wool:20}, yds:197, g:85, ga:18, mw:true, p:1, t:"smooth"},
-   {b:"Plymouth", n:"Encore Worsted", w:"Worsted", f:{acrylic:75, wool:25}, yds:200, g:100, ga:18, mw:true, p:2, t:"smooth"},
+   {b:"Plymouth", n:"Encore Worsted", w:"Worsted", f:{acrylic:75, wool:25}, yds:200, g:100, ga:20, mw:true, p:2, t:"smooth"},
    {b:"Berroco", n:"Vintage", w:"Worsted", f:{acrylic:52, wool:40, nylon:8}, yds:218, g:100, ga:19, mw:true, p:2, t:"smooth"},
    {b:"Red Heart", n:"Super Saver", w:"Worsted", f:{acrylic:100}, yds:364, g:198, ga:17, mw:true, p:1, t:"smooth"},
    {b:"Caron", n:"Simply Soft", w:"Worsted", f:{acrylic:100}, yds:315, g:170, ga:18, mw:true, p:1, t:"smooth"},
    {b:"Knit Picks", n:"Brava Worsted", w:"Worsted", f:{acrylic:100}, yds:218, g:100, ga:18, mw:true, p:1, t:"smooth"},
    {b:"Berroco", n:"Ultra Alpaca", w:"Worsted", f:{alpaca:50, wool:50}, yds:215, g:100, ga:20, mw:false, p:2, t:"smooth"},
-   {b:"Lily", n:"Sugar'n Cream", w:"Worsted", f:{cotton:100}, yds:120, g:71, ga:18, mw:true, p:1, t:"smooth"},
+   {b:"Lily", n:"Sugar'n Cream", w:"Worsted", f:{cotton:100}, yds:120, g:71, ga:20, mw:true, p:1, t:"smooth"},
    {b:"Cascade", n:"Ultra Pima", w:"DK", f:{cotton:100}, yds:220, g:100, ga:22, mw:true, p:2, t:"smooth"},
    {b:"Stylecraft", n:"Special DK", w:"DK", f:{acrylic:100}, yds:322, g:100, ga:22, mw:true, p:1, t:"smooth"},
    {b:"Paintbox", n:"Simply DK", w:"DK", f:{acrylic:100}, yds:302, g:100, ga:22, mw:true, p:1, t:"smooth"},
    {b:"Drops", n:"Karisma", w:"DK", f:{wool:100}, yds:109, g:50, ga:21, mw:true, p:1, t:"smooth"},
    {b:"Drops", n:"Merino Extra Fine", w:"DK", f:{merino:100}, yds:114, g:50, ga:21, mw:true, p:1, t:"smooth"},
    {b:"Sirdar", n:"Snuggly DK", w:"DK", f:{nylon:55, acrylic:45}, yds:179, g:50, ga:22, mw:true, p:1, t:"smooth"},
-   {b:"Rowan", n:"Felted Tweed", w:"DK", f:{wool:50, alpaca:25, polyester:25}, yds:191, g:50, ga:23, mw:false, p:3, t:"tweed"},
+   {b:"Rowan", n:"Felted Tweed", w:"DK", f:{wool:50, alpaca:25, viscose:25}, yds:191, g:50, ga:23, mw:false, p:3, t:"tweed"},
    {b:"Knit Picks", n:"Swish DK", w:"DK", f:{merino:100}, yds:123, g:50, ga:22, mw:true, p:2, t:"smooth"},
    {b:"Scheepjes", n:"Catona", w:"Sport", f:{cotton:100}, yds:137, g:50, ga:26, mw:true, p:1, t:"smooth"},
    {b:"Drops", n:"Alpaca", w:"Sport", f:{alpaca:100}, yds:182, g:50, ga:24, mw:false, p:1, t:"smooth"},
@@ -51,7 +51,7 @@
    {b:"Knit Picks", n:"Palette", w:"Fingering", f:{wool:100}, yds:231, g:50, ga:28, mw:false, p:1, t:"smooth"},
    {b:"Drops", n:"Fabel", w:"Fingering", f:{wool:75, nylon:25}, yds:224, g:50, ga:26, mw:true, p:1, t:"smooth"},
    {b:"Malabrigo", n:"Sock", w:"Fingering", f:{merino:100}, yds:440, g:100, ga:28, mw:true, p:3, t:"smooth"},
-   {b:"Lion Brand", n:"Sock-Ease", w:"Fingering", f:{wool:75, nylon:25}, yds:438, g:100, ga:28, mw:true, p:1, t:"smooth"},
+   {b:"Lion Brand", n:"Sock-Ease", w:"Fingering", f:{wool:75, nylon:25}, yds:438, g:100, ga:30, mw:true, p:1, t:"smooth"},
    {b:"Cascade", n:"Heritage", w:"Fingering", f:{merino:75, nylon:25}, yds:437, g:100, ga:28, mw:true, p:2, t:"smooth"},
    {b:"Rowan", n:"Kidsilk Haze", w:"Lace", f:{mohair:70, silk:30}, yds:229, g:25, ga:25, mw:false, p:3, t:"halo"},
    {b:"Drops", n:"Kid-Silk", w:"Lace", f:{mohair:75, silk:25}, yds:230, g:25, ga:24, mw:false, p:2, t:"halo"},
@@ -61,9 +61,9 @@
    {b:"Cascade", n:"Magnum", w:"Super Bulky", f:{wool:100}, yds:123, g:250, ga:8, mw:false, p:2, t:"roving"},
    {b:"Malabrigo", n:"Rasta", w:"Super Bulky", f:{merino:100}, yds:90, g:150, ga:8, mw:false, p:3, t:"roving"},
    {b:"Bernat", n:"Blanket", w:"Super Bulky", f:{polyester:100}, yds:220, g:300, ga:8, mw:true, p:1, t:"chenille"},
-   {b:"Bernat", n:"Softee Chunky", w:"Bulky", f:{acrylic:100}, yds:108, g:100, ga:13, mw:true, p:1, t:"smooth"},
-   {b:"Drops", n:"Andes", w:"Bulky", f:{wool:65, alpaca:35}, yds:104, g:100, ga:13, mw:false, p:1, t:"smooth"},
-   {b:"Lion Brand", n:"Hue + Me", w:"Bulky", f:{acrylic:80, wool:20}, yds:137, g:125, ga:12, mw:true, p:1, t:"roving"},
+   {b:"Bernat", n:"Softee Chunky", w:"Bulky", f:{acrylic:100}, yds:108, g:100, ga:12, mw:true, p:1, t:"smooth"},
+   {b:"Drops", n:"Andes", w:"Super Bulky", f:{wool:65, alpaca:35}, yds:98, g:100, ga:10, mw:false, p:1, t:"smooth"},
+   {b:"Lion Brand", n:"Hue + Me", w:"Bulky", f:{acrylic:80, wool:20}, yds:137, g:125, ga:14, mw:true, p:1, t:"roving"},
    {b:"Drops", n:"Paris", w:"Aran", f:{cotton:100}, yds:82, g:50, ga:17, mw:true, p:1, t:"smooth"},
    {b:"Drops", n:"Nepal", w:"Aran", f:{wool:65, alpaca:35}, yds:82, g:50, ga:17, mw:false, p:1, t:"smooth"},
    {b:"Lion Brand", n:"Heartland", w:"Aran", f:{acrylic:100}, yds:251, g:142, ga:16, mw:true, p:1, t:"smooth"},
@@ -83,14 +83,21 @@
    //   Bernat Baby Blanket ......... yarnspirations.com (#6 super bulky chenille, 100g/72yd,
    //                                 machine wash) — a same-weight match for Bernat Blanket
    //                                 (near-twin, like Cascade 220 vs 220 Superwash)
-   {b:"Quince & Co", n:"Sparrow", w:"Fingering", f:{linen:100}, yds:170, g:50, ga:24, mw:true, p:2, t:"smooth"},
+   {b:"Quince & Co", n:"Sparrow", w:"Fingering", f:{linen:100}, yds:164, g:50, ga:24, mw:true, p:2, t:"smooth"},
    {b:"Rowan", n:"Creative Linen", w:"DK", f:{cotton:50, linen:50}, yds:219, g:100, ga:21, mw:false, p:2, t:"smooth"},
    {b:"Lion Brand", n:"Truboo", w:"DK", f:{bamboo:100}, yds:241, g:100, ga:23, mw:true, p:1, t:"smooth"},
    {b:"Lion Brand", n:"Coboo", w:"DK", f:{bamboo:50, cotton:50}, yds:232, g:100, ga:23, mw:true, p:1, t:"smooth"},
-   {b:"Knit Picks", n:"Comfy Worsted", w:"Worsted", f:{cotton:75, acrylic:25}, yds:109, g:50, ga:19, mw:true, p:1, t:"chainette"},
+   {b:"Knit Picks", n:"Comfy Worsted", w:"Worsted", f:{cotton:75, acrylic:25}, yds:109, g:50, ga:19, mw:true, p:1, t:"smooth"},
    {b:"Debbie Bliss", n:"Cashmerino Aran", w:"Aran", f:{merino:55, acrylic:33, cashmere:12}, yds:98, g:50, ga:18, mw:true, p:2, t:"smooth"},
    {b:"Bernat", n:"Velvet", w:"Bulky", f:{polyester:100}, yds:315, g:300, ga:12, mw:false, p:1, t:"chenille"},
    {b:"Bernat", n:"Baby Blanket", w:"Super Bulky", f:{polyester:100}, yds:72, g:100, ga:8, mw:true, p:1, t:"chenille"},
+
+   // ---- June 2026 spec-verification pass (task 30) ------------------------------------
+   // Added while verifying records against ball-band sources: Knit Picks Lindy Chain is
+   // the genuine chainette yarn (Comfy Worsted, previously tagged chainette, is a plied
+   // 3-ply and was corrected to smooth). Sourced yarnsub.com / Knit Picks blog / Ravelry:
+   // 70% linen / 30% cotton, fingering, hand wash, 50 g / 180 yd, 28-32 sts -> ga 30.
+   {b:"Knit Picks", n:"Lindy Chain", w:"Fingering", f:{linen:70, cotton:30}, yds:180, g:50, ga:30, mw:false, p:1, t:"chainette"},
   ];
 
   // ---------- helpers ----------
@@ -124,17 +131,20 @@
     return `#${hex(r)}${hex(g)}${hex(b)}`;
   }
 
-  // When the dataset was last spot-checked against manufacturer/retailer specs.
-  // Spot-checked June 2026: Cascade 220, Malabrigo Rios, Lion Brand Wool-Ease,
-  // Caron Simply Soft, Red Heart Super Saver, Stylecraft Special DK, Bernat
-  // Blanket, Scheepjes Catona, Sirdar Snuggly DK (the last two corrected). The
-  // June 2026 gap-fill block below was sourced from manufacturer pages / yarnsub.com
-  // as it was added. Specs remain approximate/per-ball — full sign-off is task 30.
+  // When the dataset was last verified against manufacturer/retailer specs.
+  // June 2026: full per-record verification pass — all 54 records checked against
+  // manufacturer ball-band pages + yarnsub.com / Ravelry. Corrections applied to
+  // Encore Worsted, Sugar'n Cream, Sock-Ease, Hue + Me (gauge), Sparrow (yardage),
+  // Drops Andes (reclassified Super Bulky), Felted Tweed (fiber -> viscose), Comfy
+  // Worsted (texture -> smooth), Softee Chunky (gauge); Knit Picks Lindy Chain added
+  // as the chainette example. Changelog + residual notes: docs/spec-verification-2026-06.md.
   const SPECS_REVIEWED = "June 2026";
 
   // ---------- scoring ----------
   // term weights: full-match points per term
-  // (weight + thickness + fiber + gauge + texture + care = 100)
+  // (weight + thickness + fiber + gauge + texture + care = 100). A soft-gate
+  // multiplier (see gateFactor) can then scale the final score below this when the
+  // candidate is a fiber-family or distinctive-texture mismatch.
   const PTS = {
     weight: 32,         // same weight class
     weightAdjacent: 16, // one class away
@@ -151,6 +161,11 @@
   const FIBER_EXACT_SHARE = 0.6; // exact-fiber vs fiber-family mix in the fiber term
   const MIN_SCORE = 55;          // candidates scoring below this are hidden
   const MAX_RESULTS = 10;        // show at most this many matches
+  // Soft-gate floors (see gateFactor): the fraction of the score a candidate keeps at
+  // zero fiber-family overlap / maximum distinctive-texture mismatch. Below 1 so they
+  // only ever pull a mismatch down — never push a pair above 100.
+  const FAMILY_FLOOR = 0.65;
+  const TEXTURE_FLOOR = 0.60;
 
   // pairwise texture similarity 0..1 (each pair listed once; both orders looked
   // up). Identical textures score 1; unlisted pairs fall back to 0.4.
@@ -190,6 +205,28 @@
     return FIBER_EXACT_SHARE * exact + (1 - FIBER_EXACT_SHARE) * fam;
   }
 
+  // Soft gates (multiplicative, 0..1) applied to the additive score. The additive
+  // terms reward structural closeness (weight/thickness/gauge), so on their own they
+  // let a gauge-perfect but fiber- or texture-wrong yarn rank as a "match" (a wool
+  // roving for a chenille, a smooth merino for a mohair-halo). Expert substitution
+  // sources (yarnsub) treat fiber family and a distinctive texture as near-gates; we
+  // model that as a multiplier so it scales the whole score without ever pushing a
+  // pair above 100. Symmetric (so score() stays order-independent bar the care term)
+  // and 1.0 for identical yarns, so self-match stays exactly 100.
+  //   - family: disjoint families (e.g. wool vs cotton) keep FAMILY_FLOOR.
+  //   - texture: when EITHER side has a distinctive (non-smooth) texture, a texture
+  //     mismatch keeps TEXTURE_FLOOR (matching/near textures keep ~1).
+  function gateFactor(target, cand) {
+    const tf = famPct(target.f), cf = famPct(cand.f);
+    let fam = 0;
+    for (const k of ["animal", "plant", "synthetic"]) fam += Math.min(tf[k], cf[k]);
+    let factor = FAMILY_FLOOR + (1 - FAMILY_FLOOR) * (fam / 100);
+    const tsim = textureSimilarity(target.t, cand.t);
+    if (tsim !== null && (target.t !== "smooth" || cand.t !== "smooth"))
+      factor *= TEXTURE_FLOOR + (1 - TEXTURE_FLOOR) * tsim;
+    return factor;
+  }
+
   function score(target, cand) {
     const wDiff = Math.abs(WEIGHTS.indexOf(target.w) - WEIGHTS.indexOf(cand.w));
     if (wDiff > 1) return null;                       // too far apart in weight
@@ -212,7 +249,8 @@
     // care: only penalize losing machine-washability
     pts += (target.mw && !cand.mw) ? 0 : PTS.care;
 
-    return Math.round(pts);
+    // soft-gate: scale down fiber-family / distinctive-texture mismatches (factor <= 1)
+    return Math.round(pts * gateFactor(target, cand));
   }
 
   function whyText(target, cand) {
@@ -259,7 +297,7 @@
   // ---------- exports ----------
   const YarnSwap = {
     WEIGHTS, FIBERS, FAMILY, TEXTURES, YARNS, SPECS_REVIEWED,
-    PTS, THICKNESS_SLOPE, GAUGE_SLOPE, FIBER_EXACT_SHARE, MIN_SCORE, MAX_RESULTS, TEXTURE_SIM, RETAILERS,
+    PTS, THICKNESS_SLOPE, GAUGE_SLOPE, FIBER_EXACT_SHARE, MIN_SCORE, MAX_RESULTS, FAMILY_FLOOR, TEXTURE_FLOOR, TEXTURE_SIM, RETAILERS,
     escapeHtml, ypg, famPct, fiberLabel, swatchColor,
     thicknessDiff, fiberSimilarity, textureSimilarity, score, whyText, displayScore, buyLinks,
   };

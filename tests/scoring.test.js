@@ -9,8 +9,8 @@ const yarn = (over = {}) => ({
   yds: 200, g: 100, ga: 20, mw: false, p: 2, ...over,
 });
 
-test("dataset integrity: 53 records, all internally valid", () => {
-  assert.equal(Y.YARNS.length, 53);
+test("dataset integrity: 54 records, all internally valid", () => {
+  assert.equal(Y.YARNS.length, 54);
   for (const y of Y.YARNS) {
     const sum = Object.values(y.f).reduce((s, v) => s + v, 0);
     assert.equal(sum, 100, `${y.b} ${y.n} fiber blend must sum to 100 (got ${sum})`);
@@ -61,16 +61,18 @@ test("same weight class scores higher than an adjacent class", () => {
 });
 
 test("scoring is order-independent except for the directional care term", () => {
-  // The thickness/fiber/weight/gauge terms are all symmetric; only the care
-  // term is intentionally directional (losing machine-washability is penalized,
-  // gaining it is not). So score(a,b) and score(b,a) may differ by at most the
-  // care weight, and only when exactly one yarn is machine-washable.
+  // The weight/thickness/fiber/gauge/texture terms and the soft-gate are all
+  // symmetric; only the care term is intentionally directional (losing machine-
+  // washability is penalized, gaining it is not). Because the soft-gate scales the
+  // whole score, the care asymmetry is at most PTS.care and shrinks with the gate —
+  // so score(a,b) and score(b,a) differ by <= PTS.care, and only when exactly one
+  // yarn is machine-washable.
   for (const a of Y.YARNS) {
     for (const b of Y.YARNS) {
       const ab = Y.score(a, b), ba = Y.score(b, a);
       if (ab === null) { assert.equal(ba, null); continue; }
       const delta = Math.abs(ab - ba);
-      assert.ok(delta === 0 || delta === Y.PTS.care, `${a.n} vs ${b.n}: delta ${delta}`);
+      assert.ok(delta <= Y.PTS.care, `${a.n} vs ${b.n}: delta ${delta}`);
       if (delta !== 0) assert.notEqual(a.mw, b.mw, `${a.n} vs ${b.n} differ but same wash`);
     }
   }
@@ -199,4 +201,28 @@ test("for a chenille blanket yarn, a non-chenille of the same weight is texture-
   const woolEaseTQ = find("Lion Brand", "Wool-Ease Thick & Quick"); // smooth super bulky
   // the texture term should cost the smooth candidate points it would otherwise have
   assert.ok(Y.textureSimilarity(bernatBlanket.t, woolEaseTQ.t) < 0.5);
+});
+
+// ---------- soft-gate (fiber-family + distinctive-texture) ----------
+// Locks in the June-2026 retune: a multiplicative gate demotes fiber-family and
+// distinctive-texture mismatches below structurally-similar same-family matches, to
+// match expert (yarnsub) substitution behaviour. Validated against yarnsub for 8
+// flagship yarns — see docs/scoring-validation-2026-06.md.
+
+test("soft-gate: a cross-family candidate is demoted below a same-family one and hidden", () => {
+  const ultraPima = find("Cascade", "Ultra Pima");   // DK cotton (plant)
+  const coboo = find("Lion Brand", "Coboo");         // DK bamboo/cotton (plant)
+  const karisma = find("Drops", "Karisma");          // DK wool (animal), same gauge
+  assert.ok(Y.score(ultraPima, coboo) > Y.score(ultraPima, karisma),
+    "a plant-fiber DK should outrank a same-gauge wool DK as a sub for cotton");
+  assert.ok(Y.score(ultraPima, karisma) < Y.MIN_SCORE,
+    "the cross-family wool should fall below the visible-results bar");
+});
+
+test("soft-gate: a smooth candidate is gated out for a distinctive-texture (halo) target", () => {
+  const kidsilk = find("Rowan", "Kidsilk Haze");     // mohair halo lace
+  const dropsKidSilk = find("Drops", "Kid-Silk");    // mohair halo lace
+  const malabrigoLace = find("Malabrigo", "Lace");   // smooth merino lace
+  assert.ok(Y.score(kidsilk, dropsKidSilk) >= Y.MIN_SCORE, "a matching-halo sub stays recommendable");
+  assert.ok(Y.score(kidsilk, malabrigoLace) < Y.MIN_SCORE, "a smooth lace is gated below the bar");
 });
