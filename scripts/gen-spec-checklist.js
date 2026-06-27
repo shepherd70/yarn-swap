@@ -32,15 +32,16 @@ let md = `# Spec review checklist — tracker 30
 
 _Generated from \`scoring.js\` — **${rows.length} records**._
 
-Verify each yarn against an authoritative source — the **manufacturer ball band /
-product page**, [yarnsub.com](https://yarnsub.com), or [Ravelry](https://www.ravelry.com/yarns).
-For each row, tick **OK** if every field matches, or write the corrected value(s) in
-**Fix**. Hand a batch back and the corrections get applied to \`scoring.js\`, the suite
-re-run (\`node --test\`), and \`SPECS_REVIEWED\` bumped.
+A full **sourced verification pass** (manufacturer ball-band pages + [yarnsub.com](https://yarnsub.com) /
+[Ravelry](https://www.ravelry.com/yarns)) was completed **${Y.SPECS_REVIEWED}** — changelog and
+residual notes in [\`spec-verification-2026-06.md\`](./spec-verification-2026-06.md). The table
+below is the **current** spec for every record; use it for an optional second pass against a
+*physical* ball band: tick **OK** if it matches, or write the correct value in **Fix** and hand
+the batch back to have it applied to \`scoring.js\`.
 
 **Fields:** Yds = yards/ball · g = grams/ball · Gauge = sts per 4 in · MW = machine-washable · Tier = price 1–3. The **#** column is the record's position in the \`scoring.js\` \`YARNS\` array.
 
-**Progress: 0 / ${rows.length} verified.**
+**Physical ball-band re-confirmation: 0 / ${rows.length}.**
 
 > Regenerate with \`node scripts/gen-spec-checklist.js --force\` — this **overwrites** the
 > file and any notes in it. Export annotations first.
