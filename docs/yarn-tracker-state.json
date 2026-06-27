@@ -101,7 +101,7 @@
   },
   "26": {
     "status": "in-progress",
-    "notes": "Plumbing done: buyLinks() reads a RETAILERS config with an affiliate-param slot. Needs the real affiliate tags / network links dropped in (and per-network click handling differs)."
+    "notes": "Region-aware buy links shipped (PR #6, 2026-06-27): buyLinks(y, region) reads a region-keyed RETAILERS config (CA default — Yarnspirations/Mary Maxim/Amazon.ca; US — LoveCrafts/Hobbii/Amazon), region saved in the URL, with a per-retailer affiliate-param slot. Still needs the real affiliate tags dropped in (Amazon Associates ?tag=, LoveCrafts/Hobbii via Awin; per-network click handling differs)."
   },
   "27": {
     "status": "complete",
@@ -124,15 +124,15 @@
     "notes": "Deferred for v1. Live stock/price checking needs a backend or third-party API; the app is intentionally static."
   },
   "32": {
-    "status": "in-progress",
-    "notes": "GitHub Pages deploy workflow added (.github/workflows/pages.yml). Needs Pages enabled once in repo Settings (Source: GitHub Actions)."
+    "status": "complete",
+    "notes": "GitHub Pages deploy workflow added (.github/workflows/pages.yml). Root cause of the long-failing deploy: Pages needs a public repo on the free plan (private requires a paid plan), not a token/config issue. Resolved 2026-06-27: repo made public after a clean full-history secret scan, Pages enabled via API (build_type=workflow), PR #5 added configure-pages enablement:true (now functional). Deploy green in 15s; site verified LIVE (HTTP 200) at https://shepherd70.github.io/yarn-swap/."
   },
   "33": {
     "status": "complete",
     "notes": "README updated to reflect the current feature set (texture scoring, shareable URLs, swatches, accessibility, tests, deploy)."
   },
   "34": {
-    "status": "not-started",
-    "notes": "Final QA sign-off on the deployed production build, after data sign-off (30) and cross-browser (28)."
+    "status": "in-progress",
+    "notes": "Production build now deployed live at https://shepherd70.github.io/yarn-swap/ and smoke-verified 2026-06-27 (HTTP 200, correct title/markup served). Data sign-off (30) done. Full sign-off still pending the Safari/WebKit pass (28, Mac-only, user) and a visual pass over the live build."
   }
 }
