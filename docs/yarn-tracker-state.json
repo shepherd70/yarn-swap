@@ -84,8 +84,8 @@
     "notes": "Texture term added to score() with a pairwise similarity matrix; point weights rebalanced (32/22/18/13/10/5) so totals still cap at 100. Covered by tests."
   },
   "22": {
-    "status": "in-progress",
-    "notes": "Known-substitution fixture tests lock in the relationships we're confident about. Full validation/tuning of the weights against expert-curated substitutions still needs human sign-off."
+    "status": "complete",
+    "notes": "Validated against yarnsub.com (expert substitution authority) for 8 flagship yarns June 2026: engine matched clean fiber archetypes well but under-weighted fiber family + texture for fiber/texture-defined yarns. Fix applied and signed off: a multiplicative soft-gate in score() (FAMILY_FLOOR 0.65, TEXTURE_FLOOR 0.60) demotes cross-family / distinctive-texture mismatches; substitution fixtures expanded to 7 cases. Writeup: docs/scoring-validation-2026-06.md. Residuals deferred: fiber blend-ratio nuance (minor) and DB coverage gaps (task 19)."
   },
   "23": {
     "status": "complete",
