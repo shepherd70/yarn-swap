@@ -275,19 +275,37 @@
   const displayScore = s => Math.min(s, 99);
 
   // ---------- buy links ----------
+  // Retailers are grouped by shopper region so links point to a store that ships
+  // locally and prices in the local currency. Canada is the default (DEFAULT_REGION).
   // Per-retailer query tuning: Amazon gets an extra "yarn" keyword to disambiguate
-  // against its general catalog; LoveCrafts/Hobbii search yarn-only catalogs already.
+  // against its general catalog; the yarn-only stores search their catalogs directly.
   // `affiliate` is appended as a query param when set — drop in real tags here.
   // NOTE: real affiliate integration differs per network (Amazon Associates uses
   // ?tag=...; LoveCrafts/Hobbii run through Awin links). This slot is the hook.
-  const RETAILERS = [
-    { name: "LoveCrafts", search: q => `https://www.lovecrafts.com/en-us/search?term=${q}`, affiliate: "" },
-    { name: "Hobbii",     search: q => `https://hobbii.com/catalogsearch/result/?q=${q}`,    affiliate: "" },
-    { name: "Amazon",     search: q => `https://www.amazon.com/s?k=${q}+yarn`,               affiliate: "" }, // e.g. "tag=yourid-20"
+  const REGIONS = [
+    { code: "CA", label: "Canada" },
+    { code: "US", label: "United States" },
   ];
-  function buyLinks(y) {
+  const DEFAULT_REGION = "CA";
+  const RETAILERS = {
+    // Canadian stores — price in CAD and ship within Canada. Yarnspirations
+    // (Spinrite, Listowel ON) and Mary Maxim (Paris ON) cover the mass brands;
+    // Amazon.ca covers the premium/long tail. Search-URL formats verified live.
+    CA: [
+      { name: "Yarnspirations", search: q => `https://www.yarnspirations.com/search?q=${q}`, affiliate: "" },
+      { name: "Mary Maxim",     search: q => `https://marymaxim.ca/search?q=${q}`,            affiliate: "" },
+      { name: "Amazon.ca",      search: q => `https://www.amazon.ca/s?k=${q}+yarn`,           affiliate: "" },
+    ],
+    US: [
+      { name: "LoveCrafts", search: q => `https://www.lovecrafts.com/en-us/search?term=${q}`, affiliate: "" },
+      { name: "Hobbii",     search: q => `https://hobbii.com/catalogsearch/result/?q=${q}`,    affiliate: "" },
+      { name: "Amazon",     search: q => `https://www.amazon.com/s?k=${q}+yarn`,               affiliate: "" }, // e.g. "tag=yourid-20"
+    ],
+  };
+  function buyLinks(y, region) {
+    const list = RETAILERS[region] || RETAILERS[DEFAULT_REGION];
     const q = encodeURIComponent(`${y.b} ${y.n}`);
-    return RETAILERS.map(r => {
+    return list.map(r => {
       let url = r.search(q);
       if (r.affiliate) url += (url.includes("?") ? "&" : "?") + r.affiliate;
       return `<a target="_blank" rel="noopener" href="${url}">${r.name}</a>`;
@@ -297,7 +315,7 @@
   // ---------- exports ----------
   const YarnSwap = {
     WEIGHTS, FIBERS, FAMILY, TEXTURES, YARNS, SPECS_REVIEWED,
-    PTS, THICKNESS_SLOPE, GAUGE_SLOPE, FIBER_EXACT_SHARE, MIN_SCORE, MAX_RESULTS, FAMILY_FLOOR, TEXTURE_FLOOR, TEXTURE_SIM, RETAILERS,
+    PTS, THICKNESS_SLOPE, GAUGE_SLOPE, FIBER_EXACT_SHARE, MIN_SCORE, MAX_RESULTS, FAMILY_FLOOR, TEXTURE_FLOOR, TEXTURE_SIM, RETAILERS, REGIONS, DEFAULT_REGION,
     escapeHtml, ypg, famPct, fiberLabel, swatchColor,
     thicknessDiff, fiberSimilarity, textureSimilarity, score, whyText, displayScore, buyLinks,
   };

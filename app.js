@@ -8,7 +8,7 @@
   "use strict";
 
   const {
-    WEIGHTS, FIBERS, TEXTURES, YARNS, MIN_SCORE, MAX_RESULTS, SPECS_REVIEWED,
+    WEIGHTS, FIBERS, TEXTURES, YARNS, MIN_SCORE, MAX_RESULTS, SPECS_REVIEWED, REGIONS, DEFAULT_REGION,
     escapeHtml, famPct, fiberLabel, swatchColor, score, whyText, displayScore, buyLinks,
   } = window.YarnSwap;
 
@@ -100,6 +100,7 @@
     p.set("care", $("fWash").value);
     p.set("price", $("fPrice").value);
     p.set("fam", $("fFam").value);
+    p.set("region", $("fRegion").value);
     return p.toString();
   }
 
@@ -121,7 +122,7 @@
       $("sWash").checked = p.get("mw") === "1";
     }
     const setf = (id, key) => { const v = p.get(key); if (v !== null) $(id).value = v; };
-    setf("fWash", "care"); setf("fPrice", "price"); setf("fFam", "fam");
+    setf("fWash", "care"); setf("fPrice", "price"); setf("fFam", "fam"); setf("fRegion", "region");
     return true;
   }
 
@@ -180,7 +181,7 @@
       </div>
       <div class="buys" role="group" aria-label="Where to buy ${name}">
         <span class="buys-label">Shop</span>
-        ${buyLinks(y)}
+        ${buyLinks(y, $("fRegion").value)}
       </div>
     </article>`;
   }
@@ -291,6 +292,9 @@
     st.add(new Option("(unknown)", ""));
     TEXTURES.forEach(t => st.add(new Option(t, t)));
     st.value = "";
+    const sr = $("fRegion");
+    REGIONS.forEach(r => sr.add(new Option(r.label, r.code)));
+    sr.value = DEFAULT_REGION;
 
     $("reviewed").textContent = SPECS_REVIEWED;
 
@@ -309,7 +313,7 @@
     // live-feel: once the user has run a search, re-run as they tweak controls
     let debounce;
     const live = () => { if (!hasSearched) return; clearTimeout(debounce); debounce = setTimeout(findSubs, 250); };
-    ["yarnSelect","sWeight","sYds","sGrams","sGauge","sFiber","sFiberPct","sFiber2","sTexture","sWash","fWash","fPrice","fFam"]
+    ["yarnSelect","sWeight","sYds","sGrams","sGauge","sFiber","sFiberPct","sFiber2","sTexture","sWash","fWash","fPrice","fFam","fRegion"]
       .forEach(id => {
         const el = $(id);
         el.addEventListener("change", live);
