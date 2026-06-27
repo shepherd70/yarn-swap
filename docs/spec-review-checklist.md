@@ -1,6 +1,6 @@
 # Spec review checklist — tracker 30
 
-_Generated from `scoring.js` — **54 records**._
+_Generated from `scoring.js` — **60 records**._
 
 A full **sourced verification pass** (manufacturer ball-band pages + [yarnsub.com](https://yarnsub.com) /
 [Ravelry](https://www.ravelry.com/yarns)) was completed **June 2026** — changelog and
@@ -11,12 +11,12 @@ the batch back to have it applied to `scoring.js`.
 
 **Fields:** Yds = yards/ball · g = grams/ball · Gauge = sts per 4 in · MW = machine-washable · Tier = price 1–3. The **#** column is the record's position in the `scoring.js` `YARNS` array.
 
-**Physical ball-band re-confirmation: 0 / 54.**
+**Physical ball-band re-confirmation: 0 / 60.**
 
 > Regenerate with `node scripts/gen-spec-checklist.js --force` — this **overwrites** the
 > file and any notes in it. Export annotations first.
 
-## Lace (4)
+## Lace (5)
 
 | # | Yarn | Yds | g | Gauge | Fiber | MW | Tier | Texture | OK | Fix |
 |--:|------|----:|--:|------:|-------|:--:|:----:|---------|:--:|-----|
@@ -24,6 +24,7 @@ the batch back to have it applied to `scoring.js`.
 | 33 | Drops Kid-Silk | 230 | 25 | 24 | mohair 75 / silk 25 | ✗ | 2 | halo | ☐ | |
 | 34 | Malabrigo Lace | 470 | 50 | 32 | merino 100 | ✗ | 3 | smooth | ☐ | |
 | 35 | Knit Picks Shadow | 440 | 50 | 30 | merino 100 | ✗ | 1 | smooth | ☐ | |
+| 59 | Drops Lace | 437 | 50 | 28 | alpaca 70 / silk 30 | ✗ | 2 | smooth | ☐ | |
 
 ## Fingering (7)
 
@@ -47,7 +48,7 @@ the batch back to have it applied to `scoring.js`.
 | 25 | Knit Picks Brava Sport | 340 | 100 | 24 | acrylic 100 | ✓ | 1 | smooth | ☐ | |
 | 26 | Debbie Bliss Baby Cashmerino | 137 | 50 | 25 | merino 55 / acrylic 33 / cashmere 12 | ✓ | 2 | smooth | ☐ | |
 
-## DK (11)
+## DK (12)
 
 | # | Yarn | Yds | g | Gauge | Fiber | MW | Tier | Texture | OK | Fix |
 |--:|------|----:|--:|------:|-------|:--:|:----:|---------|:--:|-----|
@@ -62,6 +63,7 @@ the batch back to have it applied to `scoring.js`.
 | 47 | Rowan Creative Linen | 219 | 100 | 21 | cotton 50 / linen 50 | ✗ | 2 | smooth | ☐ | |
 | 48 | Lion Brand Truboo | 241 | 100 | 23 | bamboo 100 | ✓ | 1 | smooth | ☐ | |
 | 49 | Lion Brand Coboo | 232 | 100 | 23 | bamboo 50 / cotton 50 | ✓ | 1 | smooth | ☐ | |
+| 56 | Drops Soft Tweed | 142 | 50 | 21 | merino 50 / alpaca 25 / viscose 25 | ✗ | 2 | tweed | ☐ | |
 
 ## Worsted (14)
 
@@ -82,7 +84,7 @@ the batch back to have it applied to `scoring.js`.
 | 13 | Lily Sugar'n Cream | 120 | 71 | 20 | cotton 100 | ✓ | 1 | smooth | ☐ | |
 | 50 | Knit Picks Comfy Worsted | 109 | 50 | 19 | cotton 75 / acrylic 25 | ✓ | 1 | smooth | ☐ | |
 
-## Aran (4)
+## Aran (6)
 
 | # | Yarn | Yds | g | Gauge | Fiber | MW | Tier | Texture | OK | Fix |
 |--:|------|----:|--:|------:|-------|:--:|:----:|---------|:--:|-----|
@@ -90,14 +92,18 @@ the batch back to have it applied to `scoring.js`.
 | 44 | Drops Nepal | 82 | 50 | 17 | wool 65 / alpaca 35 | ✗ | 1 | smooth | ☐ | |
 | 45 | Lion Brand Heartland | 251 | 142 | 16 | acrylic 100 | ✓ | 1 | smooth | ☐ | |
 | 51 | Debbie Bliss Cashmerino Aran | 98 | 50 | 18 | merino 55 / acrylic 33 / cashmere 12 | ✓ | 2 | smooth | ☐ | |
+| 55 | Tahki Donegal Tweed | 183 | 100 | 18 | wool 100 | ✗ | 2 | tweed | ☐ | |
+| 60 | Stylecraft Special Aran | 214 | 100 | 18 | acrylic 100 | ✓ | 1 | smooth | ☐ | |
 
-## Bulky (3)
+## Bulky (5)
 
 | # | Yarn | Yds | g | Gauge | Fiber | MW | Tier | Texture | OK | Fix |
 |--:|------|----:|--:|------:|-------|:--:|:----:|---------|:--:|-----|
 | 40 | Bernat Softee Chunky | 108 | 100 | 12 | acrylic 100 | ✓ | 1 | smooth | ☐ | |
 | 42 | Lion Brand Hue + Me | 137 | 125 | 14 | acrylic 80 / wool 20 | ✓ | 1 | roving | ☐ | |
 | 52 | Bernat Velvet | 315 | 300 | 12 | polyester 100 | ✗ | 1 | chenille | ☐ | |
+| 57 | Cascade 128 Superwash | 128 | 100 | 14 | merino 100 | ✓ | 2 | smooth | ☐ | |
+| 58 | Malabrigo Chunky | 104 | 100 | 14 | merino 100 | ✗ | 3 | smooth | ☐ | |
 
 ## Super Bulky (6)
 
