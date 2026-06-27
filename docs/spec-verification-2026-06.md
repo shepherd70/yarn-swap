@@ -74,3 +74,37 @@ per-field OK/FIX with a confidence and citation. High-confidence, clearly-source
 unambiguous fixes were applied; judgment calls and model/shape changes were decided
 explicitly (above). Price tiers and any physical-ball-band re-confirmation remain open
 for a human pass — see [`spec-review-checklist.md`](./spec-review-checklist.md).
+
+## Tracker-19 thin-cell additions (June 2026)
+
+A follow-on pass added **6 ball-band-verified yarns (54 → 60)** to fill the sparsest
+weight/texture cells (Bulky & Lace depth, more Aran, a 2nd/3rd tweed), researched the
+same way — manufacturer pages first, Ravelry/yarnsub cross-checks, via two focused agents.
+
+| Added | Weight / texture | Fiber | yds/g · ga | Source |
+|-------|------------------|-------|------------|--------|
+| Tahki Donegal Tweed | Aran / tweed | 100% wool | 183/100 · 18 | yarn.com, Ravelry |
+| Drops Soft Tweed | DK / tweed | 50 merino / 25 alpaca / 25 viscose | 142/50 · 21 | garnstudio.com, Ravelry |
+| Cascade 128 Superwash | Bulky / smooth | 100% superwash merino | 128/100 · 14 | cascadeyarns.com |
+| Malabrigo Chunky | Bulky / smooth | 100% merino | 104/100 · 14 | malabrigoyarn.com |
+| Drops Lace | Lace / smooth | 70 baby alpaca / 30 silk | 437/50 · 28 | garnstudio.com, yarnsub |
+| Stylecraft Special Aran | Aran / smooth | 100% acrylic | 214/100 · 18 | Wool Warehouse, LoveCrafts |
+
+**Judgment calls**
+- **Drops Soft Tweed — DK, not Aran.** Ball-band gauge is 21 sts/4 in (DK); fiber recorded
+  as `merino` (band reads "Merino Wool"). Gives the DK Felted Tweed a same-weight tweed twin.
+- **Malabrigo Chunky — `mw:false`, smooth.** 100% merino but *not* superwash (hand wash),
+  unlike the superwash Rios already in the DB; 3-ply, so smooth (not roving).
+- **Drops Lace — gauge 28, not the band's 23.** DROPS prints a loose 23-st shawl tension; 28
+  reflects typical laceweight gauge and matches its grist-twin Knit Picks Shadow, so the
+  matcher pairs them instead of over-penalizing the gauge term.
+
+**Considered but rejected (to keep the data honest)**
+- **Berroco Modern Cotton, Cascade Sarasota** — both plied/smooth on inspection, not the
+  chainette they're sometimes assumed to be; would only pad already-dense cells.
+- **Patons Classic Wool Roving** — discontinued (clearance only); a poor thing to *recommend*.
+- **DROPS Brushed Alpaca Silk** — weight class genuinely ambiguous (Lace by grist vs Aran by
+  ball-band gauge); would be a scoring outlier wherever placed.
+
+**Residual:** chainette stays a single fingering entry (Lindy Chain) — a fine-weight chainette
+to pair with it is rare, and a heavier one would be weight-excluded anyway.

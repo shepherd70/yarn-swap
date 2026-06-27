@@ -80,9 +80,28 @@ const CASES = [
   },
   {
     target: ["Malabrigo", "Lace"],
-    good: [["Knit Picks", "Shadow"]],
+    good: [["Knit Picks", "Shadow"], ["Drops", "Lace"]],
     avoid: [["Rowan", "Kidsilk Haze"]],
-    note: "Two smooth merino laceweights are close twins; a mohair-halo lace knits up to a completely different fabric.",
+    note: "Smooth fine laceweights (merino Shadow, alpaca/silk Drops Lace) are close twins; a mohair-halo lace knits up to a completely different fabric.",
+  },
+  // ---- tracker-19 thin-cell additions: lock in the new in-cell relationships ----
+  {
+    target: ["Rowan", "Felted Tweed"],
+    good: [["Drops", "Soft Tweed"]],
+    avoid: [["Knit Picks", "Swish DK"]],
+    note: "Two DK tweeds (wool & merino, both flecked with alpaca/viscose) are same-weight twins; a smooth merino DK loses the tweed character.",
+  },
+  {
+    target: ["Cascade", "128 Superwash"],
+    good: [["Malabrigo", "Chunky"]],
+    avoid: [["Bernat", "Softee Chunky"]],
+    note: "Two 100% merino bulkies are mutual subs; an all-acrylic chunky is a different fiber family even at the same gauge.",
+  },
+  {
+    target: ["Stylecraft", "Special Aran"],
+    good: [["Lion Brand", "Heartland"]],
+    avoid: [["Drops", "Nepal"]],
+    note: "Two machine-wash acrylic Arans are natural subs; a wool/alpaca Aran is a different fiber family (and not machine washable).",
   },
 ];
 

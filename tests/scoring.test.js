@@ -9,8 +9,8 @@ const yarn = (over = {}) => ({
   yds: 200, g: 100, ga: 20, mw: false, p: 2, ...over,
 });
 
-test("dataset integrity: 54 records, all internally valid", () => {
-  assert.equal(Y.YARNS.length, 54);
+test("dataset integrity: 60 records, all internally valid", () => {
+  assert.equal(Y.YARNS.length, 60);
   for (const y of Y.YARNS) {
     const sum = Object.values(y.f).reduce((s, v) => s + v, 0);
     assert.equal(sum, 100, `${y.b} ${y.n} fiber blend must sum to 100 (got ${sum})`);

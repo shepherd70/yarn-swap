@@ -98,6 +98,37 @@
    // 3-ply and was corrected to smooth). Sourced yarnsub.com / Knit Picks blog / Ravelry:
    // 70% linen / 30% cotton, fingering, hand wash, 50 g / 180 yd, 28-32 sts -> ga 30.
    {b:"Knit Picks", n:"Lindy Chain", w:"Fingering", f:{linen:70, cotton:30}, yds:180, g:50, ga:30, mw:false, p:1, t:"chainette"},
+
+   // ---- June 2026 thin-cell expansion (tracker 19) -----------------------------------
+   // Targets the sparsest cells (Bulky & Lace depth, more Aran, a 2nd/3rd tweed) with
+   // ball-band-verified specs (manufacturer pages + Ravelry/yarnsub, June 2026). Sources
+   // & judgment calls, in the task-30 style:
+   //   Tahki Donegal Tweed ..... yarn.com / Ravelry (100% wool, Aran, single-ply tweed;
+   //                             feltable single-ply -> mw:false)
+   //   Drops Soft Tweed ........ garnstudio.com / Ravelry. DK per ball band (21 sts), NOT
+   //                             Aran; 50 merino / 25 alpaca / 25 viscose ("Merino Wool" on
+   //                             the band -> merino). Gives the DK Felted Tweed a same-
+   //                             weight tweed twin.
+   //   Cascade 128 Superwash ... cascadeyarns.com (100% superwash merino, Bulky, 14 sts)
+   //   Malabrigo Chunky ........ malabrigoyarn.com (100% merino, Bulky, 3-ply -> smooth;
+   //                             hand wash / NOT superwash -> mw:false)
+   //   Drops Lace .............. garnstudio.com / yarnsub (70 baby alpaca / 30 silk, 437 yd /
+   //                             50 g). ga set to 28 (typical laceweight tension, grist-twin
+   //                             of Knit Picks Shadow) rather than DROPS's loose 23-st shawl
+   //                             recommendation.
+   //   Stylecraft Special Aran . Wool Warehouse / LoveCrafts (100% acrylic, Aran, machine
+   //                             wash; the plain Special Aran, NOT "...with Wool")
+   // Considered but NOT added after verification: Berroco Modern Cotton & Cascade Sarasota
+   // (both plied, not chainette); Patons Classic Wool Roving (discontinued); DROPS Brushed
+   // Alpaca Silk (weight class genuinely ambiguous between Lace grist and Aran ball-band
+   // gauge). Chainette stays a single fingering entry (Lindy Chain) — a fine-weight
+   // chainette to pair with it is rare, and a heavier one would be weight-excluded anyway.
+   {b:"Tahki", n:"Donegal Tweed", w:"Aran", f:{wool:100}, yds:183, g:100, ga:18, mw:false, p:2, t:"tweed"},
+   {b:"Drops", n:"Soft Tweed", w:"DK", f:{merino:50, alpaca:25, viscose:25}, yds:142, g:50, ga:21, mw:false, p:2, t:"tweed"},
+   {b:"Cascade", n:"128 Superwash", w:"Bulky", f:{merino:100}, yds:128, g:100, ga:14, mw:true, p:2, t:"smooth"},
+   {b:"Malabrigo", n:"Chunky", w:"Bulky", f:{merino:100}, yds:104, g:100, ga:14, mw:false, p:3, t:"smooth"},
+   {b:"Drops", n:"Lace", w:"Lace", f:{alpaca:70, silk:30}, yds:437, g:50, ga:28, mw:false, p:2, t:"smooth"},
+   {b:"Stylecraft", n:"Special Aran", w:"Aran", f:{acrylic:100}, yds:214, g:100, ga:18, mw:true, p:1, t:"smooth"},
   ];
 
   // ---------- helpers ----------
@@ -138,6 +169,8 @@
   // Drops Andes (reclassified Super Bulky), Felted Tweed (fiber -> viscose), Comfy
   // Worsted (texture -> smooth), Softee Chunky (gauge); Knit Picks Lindy Chain added
   // as the chainette example. Changelog + residual notes: docs/spec-verification-2026-06.md.
+  // Expanded to 60 (tracker 19): +6 ball-band-verified yarns filling the thinnest
+  // Bulky/Lace/Aran/tweed cells — see the dated block at the end of YARNS above.
   const SPECS_REVIEWED = "June 2026";
 
   // ---------- scoring ----------

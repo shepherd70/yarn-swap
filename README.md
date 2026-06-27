@@ -38,9 +38,9 @@ Open `index.html` in a browser and it works (even straight off the filesystem).
 
 ## Data
 
-The starter database is **53 widely available yarns**. Specs were spot-checked against
-manufacturer/retailer data (June 2026) and are approximate/per-ball — full per-record
-sign-off against ball-band data is still pending. **Always knit a gauge swatch.**
+The starter database is **60 widely available yarns**. Specs were verified against
+manufacturer ball-band / retailer data (June 2026) and are approximate/per-ball —
+confirm against your own ball band. **Always knit a gauge swatch.**
 
 ## Deploy
 
