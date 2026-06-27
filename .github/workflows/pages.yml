@@ -1,7 +1,9 @@
 name: Deploy to GitHub Pages
 
 # Static site — deploys the repo root on every push to main.
-# One-time setup: Settings → Pages → Build and deployment → Source: GitHub Actions.
+# Pages is enabled automatically by the configure-pages step below (enablement: true),
+# so no manual setup is needed. If org policy blocks API enablement, fall back to
+# Settings → Pages → Build and deployment → Source: GitHub Actions.
 
 on:
   push:
@@ -26,6 +28,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
+        with:
+          # Auto-enable Pages on the first run so the deploy no longer fails with
+          # "Get Pages site failed... Not Found" when Pages hasn't been turned on
+          # in Settings yet. Requires the pages:write permission granted above.
+          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: .
