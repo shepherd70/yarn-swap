@@ -66,6 +66,24 @@ const CASES = [
     avoid: [["Cascade", "Magnum"], ["Lion Brand", "Wool-Ease Thick & Quick"]],
     note: "Polyester chenille near-twin; wool roving / smooth super-bulkies look and feel nothing like chenille.",
   },
+  {
+    target: ["Knit Picks", "Lindy Chain"],
+    good: [["Quince & Co", "Sparrow"]],
+    avoid: [["Malabrigo", "Sock"]],
+    note: "Linen/cotton chainette fingering pairs with the linen Sparrow; a smooth merino sock yarn is a different fiber family and texture.",
+  },
+  {
+    target: ["Lion Brand", "Truboo"],
+    good: [["Lion Brand", "Coboo"]],
+    avoid: [["Drops", "Karisma"]],
+    note: "Bamboo and bamboo/cotton are near-twins (drape, sheen); a wool DK is a different fiber family even at the same gauge.",
+  },
+  {
+    target: ["Malabrigo", "Lace"],
+    good: [["Knit Picks", "Shadow"]],
+    avoid: [["Rowan", "Kidsilk Haze"]],
+    note: "Two smooth merino laceweights are close twins; a mohair-halo lace knits up to a completely different fabric.",
+  },
 ];
 
 for (const c of CASES) {
