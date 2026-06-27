@@ -79,7 +79,7 @@
 
     <fieldset class="filters">
       <legend>Narrow it down</legend>
-      <div class="grid cols3">
+      <div class="grid cols4">
         <div class="field">
           <label for="fWash">Care requirement</label>
           <select id="fWash">
@@ -105,6 +105,10 @@
             <option value="synthetic">Synthetic (acrylic…)</option>
           </select>
         </div>
+        <div class="field">
+          <label for="fRegion">Shop region</label>
+          <select id="fRegion"></select>
+        </div>
       </div>
     </fieldset>
 
@@ -115,7 +119,7 @@
 
   <footer>
     <p class="note">Scores weigh <strong>weight class, thickness, fiber, gauge, texture, and care</strong>.
-    No substitute is identical — <strong>always knit a gauge swatch</strong> before committing. Buy links open retailer searches.
+    No substitute is identical — <strong>always knit a gauge swatch</strong> before committing. Buy links open retailer searches for your selected <strong>shop region</strong> (Canada by default).
     Specs spot-checked <span id="reviewed"></span>; confirm against your ball band.</p>
     <p class="legend" aria-hidden="true">
       <span><span class="dot dot-animal"></span>Animal</span>

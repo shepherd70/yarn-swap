@@ -23,8 +23,10 @@ Open `index.html` in a browser and it works (even straight off the filesystem).
   never claims a "perfect" match.
 - Each result shows a score ring, a fiber-family swatch (warm = animal, green = plant,
   blue = synthetic), spec pills, a plain-language rationale, and retailer search links.
-- **Shareable links:** your target yarn and filters are encoded in the URL — copy the
-  link to share or bookmark a result set; it restores on load.
+- **Shop region:** buy links default to **Canadian** retailers (Yarnspirations, Mary
+  Maxim, Amazon.ca) and can be switched to the US; the choice is saved in the link.
+- **Shareable links:** your target yarn, filters, and shop region are encoded in the URL
+  — copy the link to share or bookmark a result set; it restores on load.
 
 ## Project layout
 
@@ -51,7 +53,7 @@ Static — host the folder anywhere. For **GitHub Pages**, the included workflow
 ## Roadmap
 
 - [ ] Final per-record spec verification & sign-off
-- [ ] Affiliate links (plumbing is in place — drop tags into `RETAILERS` in `scoring.js`)
+- [ ] Affiliate links (plumbing is in place — drop tags into the per-retailer `affiliate` slots in the region-keyed `RETAILERS` in `scoring.js`)
 - [ ] Validate/tune scoring weights against expert-curated substitutions
 - [ ] Expand the yarn database further
 - [ ] Live stock/price checking (needs a backend)
