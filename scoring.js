@@ -142,7 +142,9 @@
 
   // ---------- scoring ----------
   // term weights: full-match points per term
-  // (weight + thickness + fiber + gauge + texture + care = 100)
+  // (weight + thickness + fiber + gauge + texture + care = 100). A soft-gate
+  // multiplier (see gateFactor) can then scale the final score below this when the
+  // candidate is a fiber-family or distinctive-texture mismatch.
   const PTS = {
     weight: 32,         // same weight class
     weightAdjacent: 16, // one class away
@@ -159,6 +161,11 @@
   const FIBER_EXACT_SHARE = 0.6; // exact-fiber vs fiber-family mix in the fiber term
   const MIN_SCORE = 55;          // candidates scoring below this are hidden
   const MAX_RESULTS = 10;        // show at most this many matches
+  // Soft-gate floors (see gateFactor): the fraction of the score a candidate keeps at
+  // zero fiber-family overlap / maximum distinctive-texture mismatch. Below 1 so they
+  // only ever pull a mismatch down — never push a pair above 100.
+  const FAMILY_FLOOR = 0.65;
+  const TEXTURE_FLOOR = 0.60;
 
   // pairwise texture similarity 0..1 (each pair listed once; both orders looked
   // up). Identical textures score 1; unlisted pairs fall back to 0.4.
@@ -198,6 +205,28 @@
     return FIBER_EXACT_SHARE * exact + (1 - FIBER_EXACT_SHARE) * fam;
   }
 
+  // Soft gates (multiplicative, 0..1) applied to the additive score. The additive
+  // terms reward structural closeness (weight/thickness/gauge), so on their own they
+  // let a gauge-perfect but fiber- or texture-wrong yarn rank as a "match" (a wool
+  // roving for a chenille, a smooth merino for a mohair-halo). Expert substitution
+  // sources (yarnsub) treat fiber family and a distinctive texture as near-gates; we
+  // model that as a multiplier so it scales the whole score without ever pushing a
+  // pair above 100. Symmetric (so score() stays order-independent bar the care term)
+  // and 1.0 for identical yarns, so self-match stays exactly 100.
+  //   - family: disjoint families (e.g. wool vs cotton) keep FAMILY_FLOOR.
+  //   - texture: when EITHER side has a distinctive (non-smooth) texture, a texture
+  //     mismatch keeps TEXTURE_FLOOR (matching/near textures keep ~1).
+  function gateFactor(target, cand) {
+    const tf = famPct(target.f), cf = famPct(cand.f);
+    let fam = 0;
+    for (const k of ["animal", "plant", "synthetic"]) fam += Math.min(tf[k], cf[k]);
+    let factor = FAMILY_FLOOR + (1 - FAMILY_FLOOR) * (fam / 100);
+    const tsim = textureSimilarity(target.t, cand.t);
+    if (tsim !== null && (target.t !== "smooth" || cand.t !== "smooth"))
+      factor *= TEXTURE_FLOOR + (1 - TEXTURE_FLOOR) * tsim;
+    return factor;
+  }
+
   function score(target, cand) {
     const wDiff = Math.abs(WEIGHTS.indexOf(target.w) - WEIGHTS.indexOf(cand.w));
     if (wDiff > 1) return null;                       // too far apart in weight
@@ -220,7 +249,8 @@
     // care: only penalize losing machine-washability
     pts += (target.mw && !cand.mw) ? 0 : PTS.care;
 
-    return Math.round(pts);
+    // soft-gate: scale down fiber-family / distinctive-texture mismatches (factor <= 1)
+    return Math.round(pts * gateFactor(target, cand));
   }
 
   function whyText(target, cand) {
@@ -267,7 +297,7 @@
   // ---------- exports ----------
   const YarnSwap = {
     WEIGHTS, FIBERS, FAMILY, TEXTURES, YARNS, SPECS_REVIEWED,
-    PTS, THICKNESS_SLOPE, GAUGE_SLOPE, FIBER_EXACT_SHARE, MIN_SCORE, MAX_RESULTS, TEXTURE_SIM, RETAILERS,
+    PTS, THICKNESS_SLOPE, GAUGE_SLOPE, FIBER_EXACT_SHARE, MIN_SCORE, MAX_RESULTS, FAMILY_FLOOR, TEXTURE_FLOOR, TEXTURE_SIM, RETAILERS,
     escapeHtml, ypg, famPct, fiberLabel, swatchColor,
     thicknessDiff, fiberSimilarity, textureSimilarity, score, whyText, displayScore, buyLinks,
   };
