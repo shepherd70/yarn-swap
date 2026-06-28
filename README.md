@@ -52,10 +52,11 @@ Static — host the folder anywhere. For **GitHub Pages**, the included workflow
 
 ## Roadmap
 
-- [ ] Final per-record spec verification & sign-off
+- [x] Per-record spec verification & sign-off (60 yarns, against ball-band sources)
+- [x] Validate/tune scoring weights against expert-curated substitutions (yarnsub.com)
+- [x] Even out database coverage across weight classes
 - [ ] Affiliate links (plumbing is in place — drop tags into the per-retailer `affiliate` slots in the region-keyed `RETAILERS` in `scoring.js`)
-- [ ] Validate/tune scoring weights against expert-curated substitutions
-- [ ] Expand the yarn database further
+- [ ] Expand the yarn database further (optional — coverage is already even)
 - [ ] Live stock/price checking (needs a backend)
 
 ## Disclaimer
