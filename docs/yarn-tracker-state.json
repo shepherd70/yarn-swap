@@ -101,7 +101,7 @@
   },
   "26": {
     "status": "in-progress",
-    "notes": "Region-aware buy links shipped (PR #6, 2026-06-27): buyLinks(y, region) reads a region-keyed RETAILERS config (CA default — Yarnspirations/Mary Maxim/Amazon.ca; US — LoveCrafts/Hobbii/Amazon), region saved in the URL, with a per-retailer affiliate-param slot. Still needs the real affiliate tags dropped in (Amazon Associates ?tag=, LoveCrafts/Hobbii via Awin; per-network click handling differs)."
+    "notes": "Region-aware buy links shipped (PR #6, 2026-06-27): buyLinks(y, region) reads a region-keyed RETAILERS config, region saved in the URL. 2026-06-27 follow-up: every retailer now declares an affiliate `aff.network`, and buyLinks() routes each URL through affiliateUrl() — a per-network wrapper (Amazon Associates ?tag= and Awin cread.php are verified formats; CJ automated-deep-link is scaffolded, pending CJ-dashboard confirmation; ShareASale/Impact get a case on adoption). Publisher IDs live in AFFILIATE_IDS and start EMPTY, so links stay plain (zero tracking) until tags are dropped in. Added Michaels Canada to RETAILERS.CA (now Yarnspirations/Mary Maxim/Michaels Canada/Amazon.ca on CJ/Awin/CJ/Amazon; US LoveCrafts/Hobbii/Amazon on Awin/CJ/Amazon). Candidate retailers, networks, and dropped options recorded in docs/affiliate-candidates.md. Suite green (node --test, 42). Still in-progress: obtain real publisher IDs (CJ PID, Awin affid, Amazon Associates tags per marketplace) + confirm the CJ link format before going live; optional cross-list of LoveCrafts/Hobbii into CA and add Knit Picks/WeCrochet (ShareASale)."
   },
   "27": {
     "status": "complete",
