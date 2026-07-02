@@ -63,6 +63,19 @@ Static — host the folder anywhere. For **GitHub Pages**, the included workflow
 - [ ] Expand the yarn database further
 - [ ] Live stock/price checking (needs a backend)
 
+## License & reuse
+
+Source-visible, **not** open source. The code is published so the site can run on GitHub
+Pages and so the matching logic is transparent, but **all rights are reserved** — see
+[LICENSE](LICENSE). You're welcome to read the code, fork it on GitHub, and run it locally;
+redeploying the app (in particular with modified or added affiliate identifiers) is not
+permitted.
+
+## Affiliate disclosure
+
+Some buy links are affiliate links; YarnSwap may earn a commission on qualifying purchases,
+at no extra cost to you. As an Amazon Associate, YarnSwap earns from qualifying purchases.
+
 ## Disclaimer
 
 Match scores are heuristic. No substitute is identical — always knit a gauge swatch

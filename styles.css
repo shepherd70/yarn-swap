@@ -248,6 +248,8 @@ input.invalid, select.invalid { border-color: var(--berry); background: var(--be
 /* footer */
 .note { margin: 36px auto 0; max-width: 60ch; text-align: center; font-size: .82rem; color: var(--ink-2); }
 .note strong { color: var(--ink); font-weight: 600; }
+.note.fineprint { margin-top: 14px; font-size: .74rem; opacity: .85; }
+.note.fineprint a { color: inherit; }
 .legend { display: flex; justify-content: center; flex-wrap: wrap; gap: 16px; margin: 18px 0 0; font-size: .8rem; color: var(--ink-2); }
 .legend span { display: inline-flex; align-items: center; gap: 7px; }
 .legend .dot { width: 12px; height: 12px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(38,34,29,.14); }
