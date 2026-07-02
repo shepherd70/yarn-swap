@@ -371,14 +371,38 @@
     }
   }
 
+  // Direct product-page URLs, curated per yarn × retailer. DECOUPLED from YARNS to keep
+  // records terse and because product URLs rot on a different cadence than specs (see
+  // docs/product-link-verification-2026-06.md). SPARSE BY DESIGN: any (yarn, retailer)
+  // absent here falls back to the retailer SEARCH in buyLinks() below.
+  //   key     = `${b}|${n}` — the same canonical identity the share-URL uses in app.js.
+  //   sub-key = retailer `name` (globally unique across regions).
+  //   value   = a static, trusted, absolute https URL (shape enforced by tests/products.test.js).
+  // Seeded June 2026 with the Amazon listings that passed live verification. The pass
+  // found that Amazon sells yarn lines almost entirely as per-COLORWAY child ASINs —
+  // a color-agnostic "pick your color" parent listing is the exception, and amazon.com
+  // had none at all — so only clean parents are seeded and everything else stays on
+  // search (which shows all colorways). Amazon `/dp/<ASIN>?tag=` composes cleanly with
+  // the affiliate tag (task 26).
+  const PRODUCTS = {
+    "Red Heart|Super Saver":              { "Amazon.ca": "https://www.amazon.ca/dp/B0017342OY" },
+    "Lily|Sugar'n Cream":                 { "Amazon.ca": "https://www.amazon.ca/dp/B01CUX75I4" },
+    "Lion Brand|Wool-Ease Thick & Quick": { "Amazon.ca": "https://www.amazon.ca/dp/B06Y3YT9RG" },
+    "Bernat|Baby Blanket":                { "Amazon.ca": "https://www.amazon.ca/dp/B004WQPM60" },
+  };
+  const PRODUCTS_VERIFIED = "June 2026"; // batch re-verify date for PRODUCTS (mirrors SPECS_REVIEWED)
+
   function buyLinks(y, region) {
     const list = RETAILERS[region] || RETAILERS[DEFAULT_REGION];
     const q = encodeURIComponent(`${y.b} ${y.n}`);
     const direct = PRODUCTS[`${y.b}|${y.n}`];          // { retailerName: url } | undefined
     return list.map(r => {
-      let url = r.search(q);
-      url = affiliateUrl(url, r.aff);
-      return `<a target="_blank" rel="noopener" href="${url}">${r.name}</a>`;
+      const hit = direct && direct[r.name];            // curated product URL | undefined
+      let url = hit || r.search(q);                    // direct product page, else search fallback
+      url = affiliateUrl(url, r.aff);                  // wrap in the store's affiliate link (no-op until IDs set)
+      const kind = hit ? "direct" : "search";
+      const label = hit ? "product page" : "search results";
+      return `<a target="_blank" rel="noopener" data-buy="${kind}" title="${r.name} — ${label}" href="${url}">${r.name}</a>`;
     }).join("");
   }
 
