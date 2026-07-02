@@ -1,0 +1,28 @@
+YarnSwap — Source-Available, All Rights Reserved
+
+Copyright (c) 2026 Travis (github.com/shepherd70)
+
+The YarnSwap source code is published so the site can be hosted on GitHub
+Pages and so its matching methodology is transparent. Publication of this
+repository is NOT a grant of license.
+
+Permitted:
+- Viewing the code and, per the GitHub Terms of Service, forking the
+  repository on GitHub.
+- Running the app locally for personal, non-commercial use.
+- Quoting short excerpts with attribution (e.g., in a review or article).
+
+Not permitted without prior written permission:
+- Redeploying, republishing, or redistributing the app or a derivative of
+  it, in whole or in part, on any other site or service.
+- Commercial use of any kind, including republishing the app with modified
+  or added affiliate identifiers.
+- Redistributing the yarn database (the data in scoring.js) separately.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR ITS USE.
+
+For permission requests, open an issue at github.com/shepherd70/yarn-swap.

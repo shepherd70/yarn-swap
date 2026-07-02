@@ -22,9 +22,11 @@ Open `index.html` in a browser and it works (even straight off the filesystem).
   the top 10 are shown. The displayed score is capped at 99 — it's a heuristic, so it
   never claims a "perfect" match.
 - Each result shows a score ring, a fiber-family swatch (warm = animal, green = plant,
-  blue = synthetic), spec pills, a plain-language rationale, and retailer search links.
+  blue = synthetic), spec pills, a plain-language rationale, and buy links — direct to the
+  product page where we've curated one, otherwise a retailer search.
 - **Shop region:** buy links default to **Canadian** retailers (Yarnspirations, Mary
-  Maxim, Amazon.ca) and can be switched to the US; the choice is saved in the link.
+  Maxim, Michaels Canada, Amazon.ca) and can be switched to the US; the choice is saved
+  in the link.
 - **Shareable links:** your target yarn, filters, and shop region are encoded in the URL
   — copy the link to share or bookmark a result set; it restores on load.
 
@@ -36,7 +38,9 @@ Open `index.html` in a browser and it works (even straight off the filesystem).
 | `styles.css` | All styling |
 | `scoring.js` | Yarn data + pure scoring logic (also runs in Node for tests) |
 | `app.js` | DOM wiring, rendering, filters, URL state |
-| `tests/` | `node --test` scoring suite |
+| `tests/` | `node --test` suite (scoring, substitutions, product links) |
+| `scripts/` | checklist generators for spec + product-link curation |
+| `docs/` | verification records, tracker, curation worksheets |
 
 ## Data
 
@@ -58,6 +62,19 @@ Static — host the folder anywhere. For **GitHub Pages**, the included workflow
 - [ ] Affiliate links (plumbing is in place — drop publisher IDs into `AFFILIATE_IDS` in `scoring.js`; candidates + per-network notes in `docs/affiliate-candidates.md`)
 - [ ] Expand the yarn database further (optional — coverage is already even)
 - [ ] Live stock/price checking (needs a backend)
+
+## License & reuse
+
+Source-visible, **not** open source. The code is published so the site can run on GitHub
+Pages and so the matching logic is transparent, but **all rights are reserved** — see
+[LICENSE](LICENSE). You're welcome to read the code, fork it on GitHub, and run it locally;
+redeploying the app (in particular with modified or added affiliate identifiers) is not
+permitted.
+
+## Affiliate disclosure
+
+Some buy links are affiliate links; YarnSwap may earn a commission on qualifying purchases,
+at no extra cost to you. As an Amazon Associate, YarnSwap earns from qualifying purchases.
 
 ## Disclaimer
 

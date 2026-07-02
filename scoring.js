@@ -374,6 +374,7 @@
   function buyLinks(y, region) {
     const list = RETAILERS[region] || RETAILERS[DEFAULT_REGION];
     const q = encodeURIComponent(`${y.b} ${y.n}`);
+    const direct = PRODUCTS[`${y.b}|${y.n}`];          // { retailerName: url } | undefined
     return list.map(r => {
       let url = r.search(q);
       url = affiliateUrl(url, r.aff);
@@ -384,9 +385,9 @@
   // ---------- exports ----------
   const YarnSwap = {
     WEIGHTS, FIBERS, FAMILY, TEXTURES, YARNS, SPECS_REVIEWED,
-    PTS, THICKNESS_SLOPE, GAUGE_SLOPE, FIBER_EXACT_SHARE, MIN_SCORE, MAX_RESULTS, FAMILY_FLOOR, TEXTURE_FLOOR, TEXTURE_SIM, RETAILERS, REGIONS, DEFAULT_REGION,
+    PTS, THICKNESS_SLOPE, GAUGE_SLOPE, FIBER_EXACT_SHARE, MIN_SCORE, MAX_RESULTS, FAMILY_FLOOR, TEXTURE_FLOOR, TEXTURE_SIM, RETAILERS, REGIONS, DEFAULT_REGION, PRODUCTS, PRODUCTS_VERIFIED, AFFILIATE_IDS,
     escapeHtml, ypg, famPct, fiberLabel, swatchColor,
-    thicknessDiff, fiberSimilarity, textureSimilarity, score, whyText, displayScore, buyLinks,
+    thicknessDiff, fiberSimilarity, textureSimilarity, score, whyText, displayScore, buyLinks, affiliateUrl,
   };
 
   if (typeof module !== "undefined" && module.exports) module.exports = YarnSwap;
