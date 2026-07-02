@@ -310,11 +310,11 @@
   // ---------- buy links ----------
   // Retailers are grouped by shopper region so links point to a store that ships
   // locally and prices in the local currency. Canada is the default (DEFAULT_REGION).
-  // Per-retailer query tuning: Amazon gets an extra "yarn" keyword to disambiguate
-  // against its general catalog; the yarn-only stores search their catalogs directly.
-  // `affiliate` is appended as a query param when set — drop in real tags here.
-  // NOTE: real affiliate integration differs per network (Amazon Associates uses
-  // ?tag=...; LoveCrafts/Hobbii run through Awin links). This slot is the hook.
+  // Per-retailer query tuning: the general catalogs (Michaels, Amazon) get an extra
+  // "yarn" keyword to disambiguate; the yarn-only stores search their catalogs directly.
+  // Each store declares an affiliate `aff.network`; affiliateUrl() (below) turns a
+  // destination into that network's tracked link. Publisher IDs in AFFILIATE_IDS start
+  // empty, so links stay plain until real tags are added (docs/affiliate-candidates.md).
   const REGIONS = [
     { code: "CA", label: "Canada" },
     { code: "US", label: "United States" },
@@ -323,24 +323,60 @@
   const RETAILERS = {
     // Canadian stores — price in CAD and ship within Canada. Yarnspirations
     // (Spinrite, Listowel ON) and Mary Maxim (Paris ON) cover the mass brands;
-    // Amazon.ca covers the premium/long tail. Search-URL formats verified live.
+    // Michaels Canada (canada.michaels.com) adds big-box craft breadth; Amazon.ca
+    // covers the premium/long tail. Search-URL formats verified live (2026-06).
     CA: [
-      { name: "Yarnspirations", search: q => `https://www.yarnspirations.com/search?q=${q}`, affiliate: "" },
-      { name: "Mary Maxim",     search: q => `https://marymaxim.ca/search?q=${q}`,            affiliate: "" },
-      { name: "Amazon.ca",      search: q => `https://www.amazon.ca/s?k=${q}+yarn`,           affiliate: "" },
+      { name: "Yarnspirations",  search: q => `https://www.yarnspirations.com/search?q=${q}`,  aff: { network: "cj" } },
+      { name: "Mary Maxim",      search: q => `https://marymaxim.ca/search?q=${q}`,             aff: { network: "awin", mid: "40388" } },
+      { name: "Michaels Canada", search: q => `https://canada.michaels.com/search?q=${q}+yarn`, aff: { network: "cj" } },
+      { name: "Amazon.ca",       search: q => `https://www.amazon.ca/s?k=${q}+yarn`,            aff: { network: "amazon", market: "CA" } },
     ],
     US: [
-      { name: "LoveCrafts", search: q => `https://www.lovecrafts.com/en-us/search?term=${q}`, affiliate: "" },
-      { name: "Hobbii",     search: q => `https://hobbii.com/catalogsearch/result/?q=${q}`,    affiliate: "" },
-      { name: "Amazon",     search: q => `https://www.amazon.com/s?k=${q}+yarn`,               affiliate: "" }, // e.g. "tag=yourid-20"
+      { name: "LoveCrafts", search: q => `https://www.lovecrafts.com/en-us/search?term=${q}`, aff: { network: "awin", mid: "" } }, // MID from Awin (LoveCrafts also runs a direct program)
+      { name: "Hobbii",     search: q => `https://hobbii.com/catalogsearch/result/?q=${q}`,    aff: { network: "cj" } },
+      { name: "Amazon",     search: q => `https://www.amazon.com/s?k=${q}+yarn`,               aff: { network: "amazon", market: "US" } },
     ],
   };
+
+  // Affiliate-network click wrapping (tracker 26). Each retailer's `aff.network` selects
+  // how a destination (search or product URL) becomes a tracked link. Publisher IDs live
+  // here and start EMPTY — every branch then returns the URL unchanged, so links work with
+  // zero tracking until real tags are dropped in. Amazon (?tag=) and Awin (cread.php) are
+  // verified formats; CJ is a scaffold — confirm its automated-deep-link format in the CJ
+  // dashboard before enabling. New networks (ShareASale, Impact) get their own case when a
+  // retailer adopts one; see docs/affiliate-candidates.md.
+  const AFFILIATE_IDS = {
+    amazon: { CA: "", US: "" }, // Amazon Associates store IDs per marketplace, e.g. "yourtag-20"
+    cj:     "",                 // Commission Junction publisher ID (PID)
+    awin:   "",                 // Awin publisher ID (affid)
+  };
+  function affiliateUrl(url, aff) {
+    if (!aff) return url;
+    const dest = encodeURIComponent(url);
+    switch (aff.network) {
+      case "amazon": {                                  // append ?tag= on the destination itself
+        const tag = AFFILIATE_IDS.amazon[aff.market];
+        return tag ? url + (url.includes("?") ? "&" : "?") + `tag=${tag}` : url;
+      }
+      case "awin":                                      // wrap: per-merchant mid + your global affid
+        return (AFFILIATE_IDS.awin && aff.mid)
+          ? `https://www.awin1.com/cread.php?awinmid=${aff.mid}&awinaffid=${AFFILIATE_IDS.awin}&ued=${dest}`
+          : url;
+      case "cj":                                        // CJ automated deep link — verify format in dashboard
+        return AFFILIATE_IDS.cj
+          ? `https://www.anrdoezrs.net/links/${AFFILIATE_IDS.cj}/type/dlg/${dest}`
+          : url;
+      default:                                          // unconfigured / not-yet-handled network: leave plain
+        return url;
+    }
+  }
+
   function buyLinks(y, region) {
     const list = RETAILERS[region] || RETAILERS[DEFAULT_REGION];
     const q = encodeURIComponent(`${y.b} ${y.n}`);
     return list.map(r => {
       let url = r.search(q);
-      if (r.affiliate) url += (url.includes("?") ? "&" : "?") + r.affiliate;
+      url = affiliateUrl(url, r.aff);
       return `<a target="_blank" rel="noopener" href="${url}">${r.name}</a>`;
     }).join("");
   }
