@@ -231,6 +231,10 @@ fieldset { border: 0; margin: 0; padding: 0; }
   transition: background .15s, color .15s, border-color .15s;
 }
 .buys a:hover { background: var(--berry-strong); color: #fff; border-color: var(--berry-strong); }
+/* curated product-page links (data-buy="direct") read as the "sure thing" next to
+   search fallbacks: tinted fill + a small compass arrow. Hover already goes solid. */
+.buys a[data-buy="direct"] { background: var(--berry-tint); border-color: var(--berry); }
+.buys a[data-buy="direct"]::after { content: " ↗"; font-size: .78em; }
 
 /* states */
 .state { text-align: center; padding: 34px 20px; color: var(--ink-2); }

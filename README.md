@@ -22,9 +22,11 @@ Open `index.html` in a browser and it works (even straight off the filesystem).
   the top 10 are shown. The displayed score is capped at 99 — it's a heuristic, so it
   never claims a "perfect" match.
 - Each result shows a score ring, a fiber-family swatch (warm = animal, green = plant,
-  blue = synthetic), spec pills, a plain-language rationale, and retailer search links.
+  blue = synthetic), spec pills, a plain-language rationale, and buy links — direct to the
+  product page where we've curated one, otherwise a retailer search.
 - **Shop region:** buy links default to **Canadian** retailers (Yarnspirations, Mary
-  Maxim, Amazon.ca) and can be switched to the US; the choice is saved in the link.
+  Maxim, Michaels Canada, Amazon.ca) and can be switched to the US; the choice is saved
+  in the link.
 - **Shareable links:** your target yarn, filters, and shop region are encoded in the URL
   — copy the link to share or bookmark a result set; it restores on load.
 
@@ -36,7 +38,9 @@ Open `index.html` in a browser and it works (even straight off the filesystem).
 | `styles.css` | All styling |
 | `scoring.js` | Yarn data + pure scoring logic (also runs in Node for tests) |
 | `app.js` | DOM wiring, rendering, filters, URL state |
-| `tests/` | `node --test` scoring suite |
+| `tests/` | `node --test` suite (scoring, substitutions, product links) |
+| `scripts/` | checklist generators for spec + product-link curation |
+| `docs/` | verification records, tracker, curation worksheets |
 
 ## Data
 
@@ -53,7 +57,8 @@ Static — host the folder anywhere. For **GitHub Pages**, the included workflow
 ## Roadmap
 
 - [ ] Final per-record spec verification & sign-off
-- [ ] Affiliate links (plumbing is in place — drop tags into the per-retailer `affiliate` slots in the region-keyed `RETAILERS` in `scoring.js`)
+- [ ] Affiliate links (plumbing is in place — each retailer declares an `aff.network`; drop real publisher IDs into `AFFILIATE_IDS` in `scoring.js`; program research in `docs/affiliate-candidates.md`)
+- [ ] Expand direct product-page links to the yarn-store retailers (Yarnspirations, Mary Maxim, LoveCrafts, Hobbii — see `docs/product-link-verification-2026-06.md`)
 - [ ] Validate/tune scoring weights against expert-curated substitutions
 - [ ] Expand the yarn database further
 - [ ] Live stock/price checking (needs a backend)
