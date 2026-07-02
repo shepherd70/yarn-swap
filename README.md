@@ -56,11 +56,11 @@ Static — host the folder anywhere. For **GitHub Pages**, the included workflow
 
 ## Roadmap
 
-- [ ] Final per-record spec verification & sign-off
-- [ ] Affiliate links (plumbing is in place — each retailer declares an `aff.network`; drop real publisher IDs into `AFFILIATE_IDS` in `scoring.js`; program research in `docs/affiliate-candidates.md`)
-- [ ] Expand direct product-page links to the yarn-store retailers (Yarnspirations, Mary Maxim, LoveCrafts, Hobbii — see `docs/product-link-verification-2026-06.md`)
-- [ ] Validate/tune scoring weights against expert-curated substitutions
-- [ ] Expand the yarn database further
+- [x] Per-record spec verification & sign-off (60 yarns, against ball-band sources)
+- [x] Validate/tune scoring weights against expert-curated substitutions (yarnsub.com)
+- [x] Even out database coverage across weight classes
+- [ ] Affiliate links (plumbing is in place — drop publisher IDs into `AFFILIATE_IDS` in `scoring.js`; candidates + per-network notes in `docs/affiliate-candidates.md`)
+- [ ] Expand the yarn database further (optional — coverage is already even)
 - [ ] Live stock/price checking (needs a backend)
 
 ## License & reuse
